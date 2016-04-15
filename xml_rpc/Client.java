@@ -47,14 +47,18 @@ public class Client {
 				for (int i = 0; i < nb; i++) {
 					LOGGER.info("Envoi de la requête numéro : " + i);
 					Integer result = 0;
+					String result2 = "";
 					try {
-						result = (Integer) client.execute("Calculateur.add", params);
+//						result = (Integer) client.execute("Calculateur.add", params);
+						
+						result2 = (String) client.execute("Calculateur.add", params);
 					} catch (XmlRpcException e) {
 						LOGGER.severe(
-								"Un probleme est survenu, le calculateur doit être crée est ajouté au répartiteur. Le calculateur actif dans le répartiteur doit exister. Le répartiteur doit être créé. Vérifier la concordance des ports.");
+								"Un probleme est survenu, le calculateur doit être créé et ajouté au répartiteur. Le calculateur actif dans le répartiteur doit exister. Le répartiteur doit être créé. Vérifier la concordance des ports.");
 						e.printStackTrace();
 					}
-					System.out.println("2 + 3 = " + result);
+//					System.out.println("2 + 3 = " + result);
+					System.out.println("2 + 3 = " + result2);
 
 				}
 				Thread.sleep(1000);
