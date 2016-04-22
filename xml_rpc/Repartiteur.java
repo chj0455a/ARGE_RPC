@@ -1,4 +1,5 @@
 
+import java.awt.GradientPaint;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,14 +26,12 @@ import com.google.common.collect.Maps;
 public class Repartiteur {
 	private static Logger LOGGER = Logger.getLogger("Repartiteur");
 	private static final int port = 8080;
-
-	private static HashMap<Integer, InfoCalculateur> calculateurs;
-
-	private static InfoCalculateur calculateurCourant;
+	
+	private static GestionnaireRessource gestionnaireRessource = GestionnaireRessource.getGestionnaireRessource();
 
 	public static void main(String[] args) throws Exception {
 		if (args[0] != null) {
-			calculateurs = Maps.newHashMap();
+			
 
 			WebServer webServer = new WebServer(Integer.parseInt(args[0]));
 
@@ -61,13 +60,13 @@ public class Repartiteur {
 						"Usage : update_repartiteur <machine> <portRepartiteur> <add/delete> <machine à ajouter/supprimer> <nouveauPort>");
 			} else {
 				if (params[3].equals("add")) {
-					if (calculateurs.containsKey(Integer.parseInt(params[5]))) {
+					if (gestionnaireRessource.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
 						System.out.println("Impossible d'associer le nouveau WN : le port est déjà utilisé");
 					} else {
-						creerCalculateur(params[4], Integer.parseInt(params[5]));
+						gestionnaireRessource.creerCalculateur(params[4], Integer.parseInt(params[5]));
 					}
 				} else if (params[3].equals("del")) {
-					if (!calculateurs.containsKey(Integer.parseInt(params[5]))) {
+					if (!gestionnaireRessource.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
 						System.out.println("Impossible de supprimer le WN : l'association n'existe pas");
 					} else {
 						supprimerCalculateur(params[4], Integer.parseInt(params[5]));
@@ -79,41 +78,17 @@ public class Repartiteur {
 
 	private static void supprimerCalculateur(String machine, int port) {
 		LOGGER.info("Suppression d'une association à un calculateur");
-		System.out.println(calculateurs.size() + " calculateur(s)");
-		calculateurs.remove(port);
-		if (calculateurs.size() == 0) {
-			calculateurCourant = null;
+		System.out.println(gestionnaireRessource.getCalculateurs().size() + " calculateur(s)");
+		gestionnaireRessource.getCalculateurs().remove(port);
+		if (gestionnaireRessource.getCalculateurs().size() == 0) {
+			gestionnaireRessource.setCalculateurCourant(null);
 		} else {
-			calculateurCourant = calculateurs.get(calculateurs.keySet().iterator().next());
+			gestionnaireRessource.setCalculateurCourant(gestionnaireRessource.getCalculateurs().get(gestionnaireRessource.getCalculateurs().keySet().iterator().next()));
 		}
-		System.out.println(calculateurs.size() + " calculateur(s)");
+		System.out.println(gestionnaireRessource.getCalculateurs().size() + " calculateur(s)");
 	}
 
-	private static void creerCalculateur(String machine, int port) throws MalformedURLException, XmlRpcException {
-		LOGGER.info("Ajout d'une association à un calculateur");
-		System.out.println(calculateurs.size() + " calculateur(s)");
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-		config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
-		config.setEnabledForExtensions(true);
-		config.setConnectionTimeout(60 * 1000);
-		config.setReplyTimeout(60 * 1000);
-
-		XmlRpcClient client = new XmlRpcClient();
-
-		// use Commons HttpClient as transport
-		client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
-		// set configuration
-		client.setConfig(config);
-
-		InfoCalculateur nouveau_calc = new InfoCalculateur(client, 0, 500, port);
-		if (calculateurCourant == null) {
-			calculateurCourant = nouveau_calc;
-		}
-
-		calculateurs.put(port, nouveau_calc);
-		System.out.println(calculateurs.size() + " calculateur(s)");
-		LOGGER.info("Calculateur courant : " + calculateurCourant.getPort());
-	}
+	
 
 //	public int add(int i1, int i2) throws NotEnoughtResourcesException {
 	public String add(int i1, int i2) throws NotEnoughtResourcesException {
@@ -127,68 +102,27 @@ public class Repartiteur {
 			e.printStackTrace();
 		}
 //		return res;
-		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + calculateurCourant.getPort() + ". Sa charge : " + calculateurCourant.getCharge_courante() + "/" + calculateurCourant.getCharge_max() + " RES : " + res);
-		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + calculateurCourant.getPort() + ". Sa charge : " + calculateurCourant.getCharge_courante() + "/" + calculateurCourant.getCharge_max() + " RES : " + res;
+		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + gestionnaireRessource.getCalculateurCourant().getPort() + ". Sa charge : " + gestionnaireRessource.getCalculateurCourant().getCharge_courante() + "/" + gestionnaireRessource.getCalculateurCourant().getCharge_max() + " RES : " + res);
+		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + gestionnaireRessource.getCalculateurCourant().getPort() + ". Sa charge : " + gestionnaireRessource.getCalculateurCourant().getCharge_courante() + "/" + gestionnaireRessource.getCalculateurCourant().getCharge_max() + " RES : " + res;
 	}
 
 	private int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException {
 		LOGGER.info("Transmission de requête.");
 		try {
-			choisirLeCalculateur();
+			gestionnaireRessource.choisirLeCalculateur();
 			// make the a regular call
 			Object[] params = new Object[] { new Integer(i), new Integer(3) };
-			augmenterLaCharge();
-			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
+			gestionnaireRessource.augmenterLaCharge();
+//			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
+			Integer result = (Integer) gestionnaireRessource.getCalculateurCourant().getClient().execute("Calculateur.add", params);
 			LOGGER.info("RESULTAT : " + result);
-			diminuerLaCharge();
+			gestionnaireRessource.diminuerLaCharge();
 			return result;
 		} catch (NotEnoughtResourcesException e) {
 			throw e;
 		}
 	}
-
-	private void augmenterLaCharge() {
-		LOGGER.info("+ Charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
-		LOGGER.info("+ Charge du noeud : " + calculateurCourant.getCharge_courante());
-		calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() + 1);
-		LOGGER.info("+ NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
-		LOGGER.info("+ NOUVELLE charge du noeud : " + calculateurCourant.getCharge_courante());
-	}
 	
-	private void diminuerLaCharge() {
-		LOGGER.info("- Charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
-		LOGGER.info("- Charge du noeud : " + calculateurCourant.getCharge_courante());
-		calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() - 1);
-		LOGGER.info("- NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
-		LOGGER.info("- NOUVELLE charge du noeud : " + calculateurCourant.getCharge_courante());
-	}
-
-
-	private void choisirLeCalculateur() throws NotEnoughtResourcesException {
-		if (calculateurs.get(calculateurCourant.getPort()).getCharge_courante() >= 80. / 100.
-				* calculateurs.get(calculateurCourant.getPort()).getCharge_max()) {
-			changerLaRepartition();
-		}
-
-	}
-
-	private void changerLaRepartition() throws NotEnoughtResourcesException {
-		Iterator<Integer> iterator = calculateurs.keySet().iterator();
-		Boolean trouve = false;
-		Integer next = null;
-		while (iterator.hasNext()) {
-			next = iterator.next();
-			if (!(next.intValue() == calculateurCourant.getPort()) && calculateurs.get(next)
-					.getCharge_courante() < 80 / 100 * calculateurs.get(calculateurCourant.getPort()).getCharge_max()) {
-				calculateurCourant = calculateurs.get(next);
-				trouve = true;
-			}
-		}
-		if (!trouve) {
-			throw new NotEnoughtResourcesException(
-					"Pas assez de calculateur ou charge trop importante sur les calculateurs actifs");
-		}
-	}
 
 	public int subtract(int i1, int i2) {
 		return i1 - i2;
