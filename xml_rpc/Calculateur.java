@@ -4,8 +4,16 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 public class Calculateur {
-	public int add(int i1, int i2) {
-		return (int) (Math.random() * ((1000000) + 1));
+	public int add(int i1, int i2) throws InterruptedException {
+//		int nbDivisibles = 0;
+//		for (int i = 2; i < i1; i++) {
+//			if(i1 % i == 0)
+//			{
+//				nbDivisibles ++;
+//			}
+//		}
+		Thread.sleep(500);
+		return i1 + i2;
 	}
 
 	public int subtract(int i1, int i2) {

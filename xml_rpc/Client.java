@@ -1,10 +1,15 @@
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.XmlRpcRequest;
+import org.apache.xmlrpc.client.AsyncCallback;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
@@ -20,6 +25,7 @@ public class Client {
 	private static String machine = null;
 	private static String port = null;
 	private static Boolean argOK = false;
+	private static PrintWriter writer;
 
 	public static void main(String[] args) throws Exception {
 		parseArgs(args);
@@ -39,30 +45,76 @@ public class Client {
 			client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
 			// set configuration
 			client.setConfig(config);
-
+			writer = new PrintWriter(new PrintWriter("the-file-name.txt", "UTF-8"), true);
+			writer.println("test");
+			int j = 0;
 			while (true) {
 				// make the a regular call
-				Object[] params = new Object[] { new Integer(2), new Integer(3) };
 				int nb = Integer.parseInt(nb_requete);
-				for (int i = 0; i < nb; i++) {
-					LOGGER.info("Envoi de la requête numéro : " + i);
-					Integer result = 0;
-					String result2 = "";
-					try {
-//						result = (Integer) client.execute("Calculateur.add", params);
-						
-						result2 = (String) client.execute("Calculateur.add", params);
-					} catch (XmlRpcException e) {
-						LOGGER.severe(
-								"Un probleme est survenu, le calculateur doit être créé et ajouté au répartiteur. Le calculateur actif dans le répartiteur doit exister. Le répartiteur doit être créé. Vérifier la concordance des ports.");
-						e.printStackTrace();
+				if (j < 500) {
+
+					for (int i = 0; i < 500; i++) {
+
+						j++;
+						LOGGER.info("Envoi de la requête numéro : " + i);
+						Integer result = 0;
+						// result = (Integer) client.execute("Calculateur.add",
+						// params);
+
+						new Thread(new Runnable() {
+							public void run() {
+								String result2 = "";
+								try {
+									Object[] params = new Object[] { new Integer(10000), new Integer(3) };
+									client.executeAsync("Calculateur.add", params, new AsyncCallback() {
+
+										@Override
+										public void handleResult(XmlRpcRequest arg0, Object arg1) {
+											System.out.println("File is created!");
+
+											synchronized (writer) {
+												writer.println(arg0.toString() + "\n" + arg1.toString() + "\n\n");
+LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
+											}
+										}
+
+										@Override
+										public void handleError(XmlRpcRequest arg0, Throwable arg1) {
+											LOGGER.severe(
+													"Un probleme est survenu, le calculateur doit être créé et ajouté au répartiteur. Le calculateur actif dans le répartiteur doit exister. Le répartiteur doit être créé. Vérifier la concordance des ports.");
+											arg1.printStackTrace();
+										}
+									});
+								} catch (XmlRpcException e) {
+									LOGGER.severe(
+											"Un probleme est survenu, le calculateur doit être créé et ajouté au répartiteur. Le calculateur actif dans le répartiteur doit exister. Le répartiteur doit être créé. Vérifier la concordance des ports.");
+									e.printStackTrace();
+								}
+
+							}
+						}).start();
+
+						// System.out.println("2 + 3 = " + result);
+
 					}
-//					System.out.println("2 + 3 = " + result);
-					System.out.println("2 + 3 = " + result2);
-
+					// String result2 = "";
+					// try {
+					// Object[] params = new Object[] { new Integer(0), new
+					// Integer(0) };
+					// result2 = (String) client.execute("Calculateur.add",
+					// params);
+					// System.out.println(result2);
+					//
+					// } catch (XmlRpcException e) {
+					// LOGGER.severe(
+					// "Un probleme est survenu, le calculateur doit être créé
+					// et ajouté au répartiteur. Le calculateur actif dans le
+					// répartiteur doit exister. Le répartiteur doit être créé.
+					// Vérifier la concordance des ports.");
+					// e.printStackTrace();
+					// }
+					Thread.sleep(10000);
 				}
-				Thread.sleep(1000);
-
 			}
 		}
 

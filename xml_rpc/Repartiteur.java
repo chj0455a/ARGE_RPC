@@ -117,24 +117,26 @@ public class Repartiteur {
 
 //	public int add(int i1, int i2) throws NotEnoughtResourcesException {
 	public String add(int i1, int i2) throws NotEnoughtResourcesException {
+		LOGGER.severe("!!!!!!!!!!!!!!!!!!!!!" + i1 + " " + i2);
 		int res = 0;
 		try {
-			res = this.transmettreLaRequete();
+			res = this.transmettreLaRequete(i1);
 		} catch (XmlRpcException e) {
 			e.printStackTrace();
 		} catch (NotEnoughtResourcesException e) {
 			e.printStackTrace();
 		}
 //		return res;
-		return "Calc courant : " + calculateurCourant.getPort() + ". Sa charge : " + calculateurCourant.getCharge_courante() + "/" + calculateurCourant.getCharge_max();
+		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + calculateurCourant.getPort() + ". Sa charge : " + calculateurCourant.getCharge_courante() + "/" + calculateurCourant.getCharge_max() + " RES : " + res);
+		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + calculateurCourant.getPort() + ". Sa charge : " + calculateurCourant.getCharge_courante() + "/" + calculateurCourant.getCharge_max() + " RES : " + res;
 	}
 
-	private int transmettreLaRequete() throws XmlRpcException, NotEnoughtResourcesException {
+	private int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException {
 		LOGGER.info("Transmission de requête.");
 		try {
 			choisirLeCalculateur();
 			// make the a regular call
-			Object[] params = new Object[] { new Integer(2), new Integer(3) };
+			Object[] params = new Object[] { new Integer(i), new Integer(3) };
 			augmenterLaCharge();
 			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
 			LOGGER.info("RESULTAT : " + result);
