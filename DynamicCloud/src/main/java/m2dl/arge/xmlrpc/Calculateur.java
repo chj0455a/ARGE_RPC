@@ -53,7 +53,7 @@ public class Calculateur {
 			serverConfig.setContentLengthOptional(false);
 
 			webServer.start();
-			System.out.println("Le Worker Node web a d�marr� ...");
+			System.out.println("Le Worker Node web a demarre ...");
 		}
 	}
 }

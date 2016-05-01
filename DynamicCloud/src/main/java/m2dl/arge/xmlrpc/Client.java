@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 
 public class Client {
 	private static Logger LOGGER = Logger.getLogger("Client");
-	private static String commande = null;
 	private static String nb_requete = null;
 	private static String machine = null;
 	private static String port = null;
@@ -34,7 +33,7 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		parseArgs(args);
-		if (argOK && commande.equals("client")) {
+		if (argOK) {
 			machine = (machine.equals("localhost")) ? "127.0.0.1" : machine;
 			// create configuration
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -131,7 +130,6 @@ LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
 
 		if (arguments.size() == 4) {
 			argOK = true;
-			commande = arguments.get(0);
 			nb_requete = arguments.get(1);
 			machine = arguments.get(2);
 			port = arguments.get(3);
