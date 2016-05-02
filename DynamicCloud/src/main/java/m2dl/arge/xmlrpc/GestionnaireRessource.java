@@ -39,14 +39,16 @@ public class GestionnaireRessource {
     public void creerCalculateur(String machine, int port) {
         // Création dudit calculateur
         try {
-            String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/target/appassembler/bin/";
+        	LOGGER.severe(System.getProperties().get("user.dir").toString());
+            String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
+            path = (path.contains("/target/appassembler/bin/")) ? path : path + "/target/appassembler/bin/";
             BufferedReader br = new BufferedReader(new FileReader(path+"Calculateur"));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     this.content += line;
                 }
 
-            Process processRes = Runtime.getRuntime().exec(path + "Calculateur.bat 2012");
+            Process processRes = Runtime.getRuntime().exec("bash " + path + "Calculateur 2012");
             BufferedReader bri = new BufferedReader
                     (new InputStreamReader(processRes.getInputStream()));
             BufferedReader bre = new BufferedReader
