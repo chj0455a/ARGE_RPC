@@ -34,6 +34,6 @@ public class GestionnaireRessourceTest {
         // THEN le gestionnaire a un nouveau calculateur et le port a augmenté
         assertThat(this.gestionnaireRessource.getCalculateurs().size(), is(1));
         assertThat(this.gestionnaireRessource.getNouveauPort(), is(2013));
-        assertThat(this.gestionnaireRessource.getDerniereTraceDeProcess(), is("Le worker node a demarre ..."));
+        assertThat(this.gestionnaireRessource.getDerniereTraceDeProcess(), is("Le Worker Node web a demarre ..."));
     }
 }

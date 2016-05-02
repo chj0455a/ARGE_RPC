@@ -61,13 +61,13 @@ public class GestionnaireRessource {
                 break;
             }
             bri.close();
-//            while ((lineR = bre.readLine()) != null) {
-//                pR.println(lineR);
-//                System.out.println(lineR);
-//                this.derniereTraceDeProcess += lineR;
-//                LOGGER.info("LL : " +lineR);
-//                break;
-//            }
+            while ((lineR = bre.readLine()) != null) {
+                pR.println(lineR);
+                System.out.println(lineR);
+                this.derniereTraceDeProcess += lineR;
+                LOGGER.info("LL : " +lineR);
+                break;
+            }
             bre.close();
 //            processRes.destroy();
 
