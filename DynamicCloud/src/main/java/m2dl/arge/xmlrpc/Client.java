@@ -34,6 +34,7 @@ public class Client {
 	public static void main(String[] args) throws Exception {
 		parseArgs(args);
 		if (argOK) {
+			LOGGER.info("Arguments OK");
 			machine = (machine.equals("localhost")) ? "127.0.0.1" : machine;
 			// create configuration
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -83,13 +84,13 @@ LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
 
 										public void handleError(XmlRpcRequest arg0, Throwable arg1) {
 											LOGGER.severe(
-													"Un probleme est survenu, le calculateur doit �tre cr�� et ajout� au r�partiteur. Le calculateur actif dans le r�partiteur doit exister. Le r�partiteur doit �tre cr��. V�rifier la concordance des ports.");
+													"1: Un probleme est survenu, le calculateur doit �tre cr�� et ajout� au r�partiteur. Le calculateur actif dans le r�partiteur doit exister. Le r�partiteur doit �tre cr��. V�rifier la concordance des ports.");
 											arg1.printStackTrace();
 										}
 									});
 								} catch (XmlRpcException e) {
 									LOGGER.severe(
-											"Un probleme est survenu, le calculateur doit �tre cr�� et ajout� au r�partiteur. Le calculateur actif dans le r�partiteur doit exister. Le r�partiteur doit �tre cr��. V�rifier la concordance des ports.");
+											"2: Un probleme est survenu, le calculateur doit �tre cr�� et ajout� au r�partiteur. Le calculateur actif dans le r�partiteur doit exister. Le r�partiteur doit �tre cr��. V�rifier la concordance des ports.");
 									e.printStackTrace();
 								}
 
