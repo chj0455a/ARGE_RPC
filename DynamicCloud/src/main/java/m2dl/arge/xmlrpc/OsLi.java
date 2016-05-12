@@ -17,14 +17,18 @@ import org.openstack4j.openstack.networking.domain.NeutronSubnet;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 public class OsLi {
+	private static Logger LOGGER = Logger.getLogger("OsLi");
     public static void main(String[] args) {
+        LOGGER.info("Try to connect to cloudmip vm");
 	OSClient os = OSFactory.builder()
 	    .endpoint("http://195.220.53.45:5000/v2.0")
 	    .credentials("ens27","BTAAMU").tenantName("service")
 	    .authenticate();
+        LOGGER.info("Connection succeed");
 	System.out.println(os);
 	System.out.println(os.images().list());
 
