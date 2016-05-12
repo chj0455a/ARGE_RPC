@@ -3,35 +3,21 @@ package m2dl.arge.xmlrpc;
 
 
 
-import java.awt.GradientPaint;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
-import org.apache.xmlrpc.common.TypeConverterFactoryImpl;
 //  import org.apache.xmlrpc.demo.webserver.proxy.impls.AdderImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
-import com.google.common.collect.Maps;
-
 public class Repartiteur {
 	private static Logger LOGGER = Logger.getLogger("Repartiteur");
 	private static final int port = 8080;
 	
-	private static GestionnaireRessource gestionnaireRessource = GestionnaireRessource.getGestionnaireRessource();
+	private static VMManager vMManager = VMManager.getGestionnaireRessource();
 
 	public static void main(String[] args) throws Exception {
 		if (args[0] != null) {
@@ -64,13 +50,13 @@ public class Repartiteur {
 						"Usage : update_repartiteur <machine> <portRepartiteur> <add/delete> <machine � ajouter/supprimer> <nouveauPort>");
 			} else {
 				if (params[3].equals("add")) {
-					if (gestionnaireRessource.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
+					if (vMManager.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
 						System.out.println("Impossible d'associer le nouveau WN : le port est d�j� utilis�");
 					} else {
-						gestionnaireRessource.creerCalculateur(params[4], Integer.parseInt(params[5]));
+						vMManager.creerCalculateur(params[4], Integer.parseInt(params[5]));
 					}
 				} else if (params[3].equals("del")) {
-					if (!gestionnaireRessource.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
+					if (!vMManager.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
 						System.out.println("Impossible de supprimer le WN : l'association n'existe pas");
 					} else {
 						supprimerCalculateur(params[4], Integer.parseInt(params[5]));
@@ -82,14 +68,14 @@ public class Repartiteur {
 
 	private static void supprimerCalculateur(String machine, int port) {
 		LOGGER.info("Suppression d'une association � un calculateur");
-		System.out.println(gestionnaireRessource.getCalculateurs().size() + " calculateur(s)");
-		gestionnaireRessource.getCalculateurs().remove(port);
-		if (gestionnaireRessource.getCalculateurs().size() == 0) {
-			gestionnaireRessource.setCalculateurCourant(null);
+		System.out.println(vMManager.getCalculateurs().size() + " calculateur(s)");
+		vMManager.getCalculateurs().remove(port);
+		if (vMManager.getCalculateurs().size() == 0) {
+			vMManager.setCalculateurCourant(null);
 		} else {
-			gestionnaireRessource.setCalculateurCourant(gestionnaireRessource.getCalculateurs().get(gestionnaireRessource.getCalculateurs().keySet().iterator().next()));
+			vMManager.setCalculateurCourant(vMManager.getCalculateurs().get(vMManager.getCalculateurs().keySet().iterator().next()));
 		}
-		System.out.println(gestionnaireRessource.getCalculateurs().size() + " calculateur(s)");
+		System.out.println(vMManager.getCalculateurs().size() + " calculateur(s)");
 	}
 
 	
@@ -106,21 +92,21 @@ public class Repartiteur {
 			e.printStackTrace();
 		}
 //		return res;
-		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + gestionnaireRessource.getCalculateurCourant().getPort() + ". Sa charge : " + gestionnaireRessource.getCalculateurCourant().getCharge_courante() + "/" + gestionnaireRessource.getCalculateurCourant().getCharge_max() + " RES : " + res);
-		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + gestionnaireRessource.getCalculateurCourant().getPort() + ". Sa charge : " + gestionnaireRessource.getCalculateurCourant().getCharge_courante() + "/" + gestionnaireRessource.getCalculateurCourant().getCharge_max() + " RES : " + res;
+		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + vMManager.getCalculateurCourant().getPort() + ". Sa charge : " + vMManager.getCalculateurCourant().getCharge_courante() + "/" + vMManager.getCalculateurCourant().getCharge_max() + " RES : " + res);
+		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + vMManager.getCalculateurCourant().getPort() + ". Sa charge : " + vMManager.getCalculateurCourant().getCharge_courante() + "/" + vMManager.getCalculateurCourant().getCharge_max() + " RES : " + res;
 	}
 
 	private int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException {
 		LOGGER.info("Transmission de requ�te.");
 		try {
-			gestionnaireRessource.choisirLeCalculateur();
+			vMManager.choisirLeCalculateur();
 			// make the a regular call
 			Object[] params = new Object[] { new Integer(i), new Integer(3) };
-			gestionnaireRessource.augmenterLaCharge();
+			vMManager.augmenterLaCharge();
 //			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
-			Integer result = (Integer) gestionnaireRessource.getCalculateurCourant().getClient().execute("Calculateur.add", params);
+			Integer result = (Integer) vMManager.getCalculateurCourant().getClient().execute("Calculateur.add", params);
 			LOGGER.info("RESULTAT : " + result);
-			gestionnaireRessource.diminuerLaCharge();
+			vMManager.diminuerLaCharge();
 			return result;
 		} catch (NotEnoughtResourcesException e) {
 			throw e;

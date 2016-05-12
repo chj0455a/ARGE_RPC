@@ -10,9 +10,9 @@ import static org.junit.Assert.*;
 /**
  * Created by Tales of symphonia on 01/05/2016.
  */
-public class GestionnaireRessourceTest {
+public class VMManagerTest {
 
-    GestionnaireRessource gestionnaireRessource;
+    VMManager vMManager;
 
     @Before
     public void setUpt() {
@@ -29,11 +29,11 @@ public class GestionnaireRessourceTest {
         // GIVEN
 
         // WHEN un gestionnaire est créé et créé donc un pr'emier calculateur
-        this.gestionnaireRessource = GestionnaireRessource.getGestionnaireRessource();
+        this.vMManager = VMManager.getGestionnaireRessource();
 
         // THEN le gestionnaire a un nouveau calculateur et le port a augmenté
-        assertThat(this.gestionnaireRessource.getCalculateurs().size(), is(1));
-        assertThat(this.gestionnaireRessource.getNouveauPort(), is(2013));
-        assertThat(this.gestionnaireRessource.getDerniereTraceDeProcess(), is("Le Worker Node web a demarre ..."));
+        assertThat(this.vMManager.getCalculateurs().size(), is(1));
+        assertThat(this.vMManager.getNouveauPort(), is(2013));
+        assertThat(this.vMManager.getDerniereTraceDeProcess(), is("Le Worker Node web a demarre ..."));
     }
 }
