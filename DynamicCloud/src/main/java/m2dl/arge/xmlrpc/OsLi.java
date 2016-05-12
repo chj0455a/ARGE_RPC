@@ -1,21 +1,9 @@
 package m2dl.arge.xmlrpc;
 
 import org.openstack4j.api.OSClient;
-import org.openstack4j.model.compute.Action;
-import org.openstack4j.model.compute.Flavor;
-import org.openstack4j.model.compute.Server;
-import org.openstack4j.model.identity.Tenant;
-import org.openstack4j.model.identity.User;
-import org.openstack4j.model.image.Image;
-import org.openstack4j.model.network.IPVersionType;
-import org.openstack4j.model.network.Network;
-import org.openstack4j.model.network.Router;
-import org.openstack4j.model.network.Subnet;
+import org.openstack4j.model.compute.Image;
 import org.openstack4j.openstack.OSFactory;
-import org.openstack4j.openstack.networking.domain.NeutronNetwork;
-import org.openstack4j.openstack.networking.domain.NeutronSubnet;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -30,5 +18,10 @@ public class OsLi {
 	    .authenticate();
         LOGGER.info("Connection succeed");
 	System.out.println(os);
+        List<? extends Image> imagesList = os.compute().images().list();
+        for (Image image :
+                imagesList) {
+            LOGGER.info(image.getName() + " " + image.getName());
+        }
     }
 }

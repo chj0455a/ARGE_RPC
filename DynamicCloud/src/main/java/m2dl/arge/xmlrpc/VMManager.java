@@ -49,7 +49,7 @@ public class VMManager {
     public InfoCalculateur creerCalculateur(String machine, int port) {
         // Création dudit calculateur
         // TODO ; openstack
-        this.cloudmipConnection();
+//        this.cloudmipConnection();
         try {
 //        	LOGGER.severe(System.getProperties().get("user.dir").toString());
             String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
@@ -146,7 +146,9 @@ public class VMManager {
     public void diminuerLaCharge() {
         LOGGER.info("- Charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
         LOGGER.info("- Charge du noeud : " + calculateurCourant.getCharge_courante());
-        calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() - 1);
+        if(calculateurCourant.getCharge_courante() > 0) {
+            calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() - 1);
+        }
         LOGGER.info("- NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
         LOGGER.info("- NOUVELLE charge du noeud : " + calculateurCourant.getCharge_courante());
     }
