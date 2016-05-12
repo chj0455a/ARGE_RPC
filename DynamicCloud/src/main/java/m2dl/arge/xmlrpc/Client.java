@@ -55,9 +55,9 @@ public class Client {
 			while (true) {
 				// make the a regular call
 				int nb = Integer.parseInt(nb_requete);
-				if (j < 500) {
+				if (j < nb) {
 
-					for (int i = 0; i < 500; i++) {
+					for (int i = 0; i < nb; i++) {
 
 						j++;
 						LOGGER.info("Envoi de la requ�te num�ro : " + i);
@@ -128,11 +128,11 @@ LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
 			arguments.add(string);
 		}
 
-		if (arguments.size() == 4) {
+		if (arguments.size() == 3) {
 			argOK = true;
-			nb_requete = arguments.get(1);
-			machine = arguments.get(2);
-			port = arguments.get(3);
+			nb_requete = arguments.get(0);
+			machine = arguments.get(1);
+			port = arguments.get(2);
 		}
 	}
 }

@@ -21,7 +21,6 @@ public class GestionnaireRessource {
     private static HashMap<Integer, InfoCalculateur> calculateurs;
     private int nouveauPort = 2012;
     private String derniereTraceDeProcess = "";
-    private String content = "";
 
     private GestionnaireRessource() {
         calculateurs = Maps.newHashMap();
@@ -36,41 +35,41 @@ public class GestionnaireRessource {
         return instance;
     }
 
-    public void creerCalculateur(String machine, int port) {
+    public InfoCalculateur creerCalculateur(String machine, int port) {
         // Création dudit calculateur
         try {
-        	LOGGER.severe(System.getProperties().get("user.dir").toString());
+//        	LOGGER.severe(System.getProperties().get("user.dir").toString());
             String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
             path = (path.contains("/target/appassembler/bin/")) ? path : path + "/target/appassembler/bin/";
-            BufferedReader br = new BufferedReader(new FileReader(path+"Calculateur"));
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    this.content += line;
-                }
+//            BufferedReader br = new BufferedReader(new FileReader(path+"Calculateur"));
+//                String line = null;
+//                while ((line = br.readLine()) != null) {
+//                    this.content += line;
+//                }
 
-            Process processRes = Runtime.getRuntime().exec("bash " + path + "Calculateur 2012");
-            BufferedReader bri = new BufferedReader
-                    (new InputStreamReader(processRes.getInputStream()));
-            BufferedReader bre = new BufferedReader
-                    (new InputStreamReader(processRes.getErrorStream()));
-            PrintWriter pR = new PrintWriter(new PrintWriter("Calculateur" + this.nouveauPort + "Log.txt", "UTF-8"), true);
-            String lineR;
-            while ((lineR = bri.readLine()) != null) {
-                pR.println(lineR);
-                System.out.println(lineR);
-                this.derniereTraceDeProcess += lineR;
-                LOGGER.info("LL : " +lineR);
-                break;
-            }
-            bri.close();
-            while ((lineR = bre.readLine()) != null) {
-                pR.println(lineR);
-                System.out.println(lineR);
-                this.derniereTraceDeProcess += lineR;
-                LOGGER.info("LL : " +lineR);
-                break;
-            }
-            bre.close();
+            Process processRes = Runtime.getRuntime().exec("bash " + path + "Calculateur " + port);
+//            BufferedReader bri = new BufferedReader
+//                    (new InputStreamReader(processRes.getInputStream()));
+//            BufferedReader bre = new BufferedReader
+//                    (new InputStreamReader(processRes.getErrorStream()));
+//            PrintWriter pR = new PrintWriter(new PrintWriter("Calculateur" + this.nouveauPort + "Log.txt", "UTF-8"), true);
+//            String lineR;
+//            while ((lineR = bri.readLine()) != null) {
+//                pR.println(lineR);
+//                System.out.println(lineR);
+//                this.derniereTraceDeProcess += lineR;
+//                LOGGER.info("LL : " +lineR);
+//                break;
+//            }
+//            bri.close();
+//            while ((lineR = bre.readLine()) != null) {
+//                pR.println(lineR);
+//                System.out.println(lineR);
+//                this.derniereTraceDeProcess += lineR;
+//                LOGGER.info("LL : " +lineR);
+//                break;
+//            }
+//            bre.close();
 //            processRes.destroy();
 
         } catch (IOException e) {
@@ -99,14 +98,15 @@ public class GestionnaireRessource {
         client.setConfig(config);
 
         InfoCalculateur nouveau_calc = new InfoCalculateur(client, 0, 500, port);
-        if (calculateurCourant == null) {
+//        if (calculateurCourant == null) {
             calculateurCourant = nouveau_calc;
-        }
+//        }
 
         calculateurs.put(port, nouveau_calc);
         System.out.println(calculateurs.size() + " calculateur(s)");
         LOGGER.info("Calculateur courant : " + calculateurCourant.getPort());
         this.nouveauPort++;
+        return nouveau_calc;
     }
 
     public void augmenterLaCharge() {
@@ -158,7 +158,7 @@ public class GestionnaireRessource {
 //            throw new NotEnoughtResourcesException(
 //                    "Pas assez de calculateur ou charge trop importante sur les calculateurs actifs");
             // Création d'un nouveau calculateur
-            this.creerCalculateur("127.0.0.1", this.nouveauPort);
+            calculateurCourant = this.creerCalculateur("127.0.0.1", this.nouveauPort);
         }
     }
 

@@ -44,6 +44,11 @@
 			<artifactId>commons-httpclient</artifactId>
 			<version>3.1</version>
 		</dependency>
+        <dependency>
+            <groupId>org.pacesys</groupId>
+            <artifactId>openstack4j</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<finalName>DynamicCloud</finalName>
@@ -150,6 +155,11 @@
 							<mainClass>m2dl.arge.xmlrpc.Client</mainClass>
 							<id>Client</id>
 							<name>Client</name>
+						</program>
+						<program>
+							<mainClass>m2dl.arge.xmlrpc.OsLi</mainClass>
+							<id>OsLi</id>
+							<name>OsLi</name>
 						</program>
 					</programs>
 				</configuration>

@@ -10,42 +10,44 @@ import java.io.IOException;
 import java.net.BindException;
 
 public class Calculateur {
-	public int add(int i1, int i2) throws InterruptedException {
-		// int nbDivisibles = 0;
-		// for (int i = 2; i < i1; i++) {
-		// if(i1 % i == 0)
-		// {
-		// nbDivisibles ++;
-		// }
-		// }
-		Thread.sleep(500);
-		return i1 + i2;
-	}
+    private static int monPort = 0;
 
-	public int subtract(int i1, int i2) {
-		return i1 - i2;
-	}
+    public int add(int i1, int i2) throws InterruptedException {
+        int nbDivisibles = 0;
+        for (int i = 2; i < i1; i++) {
+            if (i1 % i == 0) {
+                nbDivisibles++;
+            }
+        }
+        Thread.sleep(5000);
+        return monPort;
+    }
 
-	public static void main(String[] args) throws IOException, XmlRpcException {
-		if (args[0] != null) {
-			try {
+    public int subtract(int i1, int i2) {
+        return i1 - i2;
+    }
+
+    public static void main(String[] args) throws IOException, XmlRpcException {
+        if (args[0] != null) {
+            try {
+                monPort = Integer.parseInt(args[0]);
 //				try {
-					// Test
-					Integer.parseInt(args[0]);
+                // Test
+                Integer.parseInt(args[0]);
 
-					WebServer webServer = new WebServer(Integer.parseInt(args[0]));
+                WebServer webServer = new WebServer(Integer.parseInt(args[0]));
 
-					XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
+                XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
-					PropertyHandlerMapping phm = new PropertyHandlerMapping();
-					/*
+                PropertyHandlerMapping phm = new PropertyHandlerMapping();
+                    /*
 					 * Load handler definitions from a property file. The
 					 * property file might look like:
 					 * Calculator=org.apache.xmlrpc.demo.Calculator
 					 * org.apache.xmlrpc.demo.proxy.Adder=org.apache.xmlrpc.demo
 					 * .proxy. AdderImpl
 					 */
-					phm.load(Thread.currentThread().getContextClassLoader(), "XmlRpcCalculator.properties");
+                phm.load(Thread.currentThread().getContextClassLoader(), "XmlRpcCalculator.properties");
 
 					/*
 					 * You may also provide the handler classes directly, like
@@ -55,24 +57,24 @@ public class Calculateur {
 					 * getName() ,
 					 * org.apache.xmlrpc.demo.proxy.AdderImpl.class);
 					 */
-					xmlRpcServer.setHandlerMapping(phm);
+                xmlRpcServer.setHandlerMapping(phm);
 
-					XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
-					serverConfig.setEnabledForExtensions(true);
-					serverConfig.setContentLengthOptional(false);
+                XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
+                serverConfig.setEnabledForExtensions(true);
+                serverConfig.setContentLengthOptional(false);
 
-					webServer.start();
-					System.out.println("Le Worker Node web a demarre ...");
+                webServer.start();
+                System.out.println("Le Worker Node web a demarre ...");
 //				} catch (BindException e) {
 //					String[] argsTemp = new String[1];
 //					argsTemp[0] = (Integer.parseInt(args[0]) + 1) + "" ;
 //					Calculateur.main(argsTemp);
 //				}
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                System.out.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
-			}
-		}
-	}
+            }
+        }
+    }
 }
