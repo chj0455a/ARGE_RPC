@@ -73,7 +73,7 @@ public class VMManager {
         Image imageForNewVM = null;
         for (Image image :
                 imagesList) {
-            if (image.getName().equals("jcWNimg")) {
+            if (image.getName().equals("trueJCWNimg")) {
                 imageForNewVM = image;
             }
         }
@@ -140,7 +140,7 @@ public class VMManager {
 //        }
         String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr();
         String id = server.getId();
-
+        System.out.println(id + " " + adresse);
 
         // Ajout de la référence vers le nouveau calculateur
         LOGGER.info("Ajout d'une association � un calculateur");
