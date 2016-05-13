@@ -20,7 +20,7 @@ public class Repartiteur {
 	private static VMManager vMManager;
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("Repartiteur nouvelle version");
+		System.out.println("Repartiteur nouvelle version2");
 		if (args[0] != null) {
 			vMManager = VMManager.getGestionnaireRessource();
 
