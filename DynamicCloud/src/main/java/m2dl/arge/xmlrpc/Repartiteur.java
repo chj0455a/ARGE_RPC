@@ -17,11 +17,12 @@ public class Repartiteur {
 	private static Logger LOGGER = Logger.getLogger("Repartiteur");
 	private static final int port = 8080;
 	
-	private static VMManager vMManager = VMManager.getGestionnaireRessource();
+	private static VMManager vMManager;
 
 	public static void main(String[] args) throws Exception {
+		System.out.println("Repartiteur nouvelle version");
 		if (args[0] != null) {
-			
+			vMManager = VMManager.getGestionnaireRessource();
 
 			WebServer webServer = new WebServer(Integer.parseInt(args[0]));
 
@@ -66,7 +67,7 @@ public class Repartiteur {
 		}
 	}
 
-	private static void supprimerCalculateur(String machine, int port) {
+	private synchronized static void supprimerCalculateur(String machine, int port) {
 		LOGGER.info("Suppression d'une association � un calculateur");
 		System.out.println(vMManager.getCalculateurs().size() + " calculateur(s)");
 		vMManager.getCalculateurs().remove(port);
@@ -81,7 +82,7 @@ public class Repartiteur {
 	
 
 //	public int add(int i1, int i2) throws NotEnoughtResourcesException {
-	public String add(int i1, int i2) throws NotEnoughtResourcesException {
+	public String add(int i1, int i2) throws NotEnoughtResourcesException, MissingImageException {
 		LOGGER.severe("!!!!!!!!!!!!!!!!!!!!!" + i1 + " " + i2);
 		int res = 0;
 		try {
@@ -96,7 +97,7 @@ public class Repartiteur {
 		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + vMManager.getCalculateurCourant().getPort() + ". Sa charge : " + vMManager.getCalculateurCourant().getCharge_courante() + "/" + vMManager.getCalculateurCourant().getCharge_max() + " RES : " + res;
 	}
 
-	private int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException {
+	private synchronized int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException, MissingImageException {
 		LOGGER.info("Transmission de requ�te.");
 		try {
 			vMManager.choisirLeCalculateur();

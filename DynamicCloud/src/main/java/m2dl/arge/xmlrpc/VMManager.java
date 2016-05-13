@@ -1,66 +1,116 @@
 package m2dl.arge.xmlrpc;
 
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Maps;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
-
-import com.google.common.collect.Maps;
+import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
-import org.openstack4j.model.compute.Flavor;
-import org.openstack4j.model.compute.Server;
-import org.openstack4j.model.identity.Tenant;
-import org.openstack4j.model.identity.User;
-import org.openstack4j.model.image.Image;
-import org.openstack4j.model.network.Network;
-import org.openstack4j.model.network.Router;
-import org.openstack4j.model.network.Subnet;
+import org.openstack4j.model.compute.*;
+import org.openstack4j.model.compute.ext.DomainEntry;
 import org.openstack4j.openstack.OSFactory;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class VMManager {
     private static Logger LOGGER = Logger.getLogger("VMManager");
     private static VMManager instance;
     private static InfoCalculateur calculateurCourant;
-    private static HashMap<Integer, InfoCalculateur> calculateurs;
+    private static HashMap<String, InfoCalculateur> calculateurs;
     private int nouveauPort = 2012;
     private String derniereTraceDeProcess = "";
+    private int nombreVM = 0;
 
-    private VMManager() {
+    private VMManager() throws MissingImageException {
         calculateurs = Maps.newHashMap();
         // Création d'un premier calculateur.
         creerCalculateur("127.0.0.1", this.nouveauPort);
+        Thread clean = new Thread(){
+            @Override
+            public void run() {
+                List<InfoCalculateur> calcs = new ArrayList<>(VMManager.this.calculateurs.values());
+                for (InfoCalculateur calc:
+                calcs){
+                    if(!calc.getAdresse().equals(VMManager.this.calculateurCourant.getAdresse()) && calc.getCharge_courante() < 10. / 100. * calc.getCharge_max()) {
+                        calc.setState(CalcState.WILL_BE_DELETED);
+                        try {
+                            Thread.sleep(10000);
+                            VMManager.this.deleteVM(calc);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        };
     }
 
-    public static VMManager getGestionnaireRessource() {
+    private synchronized void deleteVM(InfoCalculateur calc) {
+        OSClient os = this.cloudmipConnection();
+        this.calculateurs.remove(calc.getAdresse());
+        os.compute().servers().delete(calc.getId());
+    }
+
+    public static VMManager getGestionnaireRessource() throws MissingImageException {
         if (instance == null) {
             instance = new VMManager();
         }
         return instance;
     }
 
-    public InfoCalculateur creerCalculateur(String machine, int port) {
+    public synchronized InfoCalculateur creerCalculateur(String machine, int port) throws MissingImageException {
         // Création dudit calculateur
-        // TODO ; openstack
-//        this.cloudmipConnection();
-        try {
+        OSClient os = this.cloudmipConnection();
+        // Récupérer l'image
+        this.nombreVM++;
+//        Image img = os.compute().images().get("jUb");
+        List<? extends Image> imagesList = os.compute().images().list();
+        Image imageForNewVM = null;
+        for (Image image :
+                imagesList) {
+            if (image.getName().equals("jcWNimg")) {
+                imageForNewVM = image;
+            }
+        }
+
+        Server server;
+        if (imageForNewVM != null) {
+            // Create a Server Model Object
+            ArrayList<String> networks = new ArrayList<>();
+            networks.add("c1445469-4640-4c5a-ad86-9c0cb6650cca");
+            ServerCreate sc = Builders.server().name("JC_WN_" + this.nombreVM).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
+
+            // Boot the Server
+            server = os.compute().servers().bootAndWaitActive(sc, 120);
+
+            // Créer une addresse ip privée
+            // Créer la vm
+
+            // Associer vm et ip
+
+
+        } else {
+            LOGGER.severe("L'image jUb n'a pas été trouvée");
+            throw new MissingImageException("L'image jUb n'a pas été trouvée");
+        }
+
+
+//        try {
 //        	LOGGER.severe(System.getProperties().get("user.dir").toString());
-            String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
-            path = (path.contains("/target/appassembler/bin/")) ? path : path + "/target/appassembler/bin/";
+//String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
+//path = (path.contains("/target/appassembler/bin/")) ? path : path + "/target/appassembler/bin/";
 //            BufferedReader br = new BufferedReader(new FileReader(path+"Calculateur"));
 //                String line = null;
 //                while ((line = br.readLine()) != null) {
 //                    this.content += line;
 //                }
 
-            Process processRes = Runtime.getRuntime().exec("bash " + path + "Calculateur " + port);
+//Process processRes = Runtime.getRuntime().exec("bash " + path + "Calculateur " + port);
 //            BufferedReader bri = new BufferedReader
 //                    (new InputStreamReader(processRes.getInputStream()));
 //            BufferedReader bre = new BufferedReader
@@ -84,10 +134,12 @@ public class VMManager {
 //            }
 //            bre.close();
 //            processRes.destroy();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr();
+        String id = server.getId();
 
 
         // Ajout de la référence vers le nouveau calculateur
@@ -95,7 +147,8 @@ public class VMManager {
         System.out.println(calculateurs.size() + " calculateur(s)");
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try {
-            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
+//            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
+            config.setServerURL(new URL("http://" + adresse + ":2012/calculateur"));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -110,56 +163,57 @@ public class VMManager {
         // set configuration
         client.setConfig(config);
 
-        InfoCalculateur nouveau_calc = new InfoCalculateur(client, 0, 500, port);
+        InfoCalculateur nouveau_calc = new InfoCalculateur(client, 0, 500, 2012, adresse, id);
 //        if (calculateurCourant == null) {
-            calculateurCourant = nouveau_calc;
+        calculateurCourant = nouveau_calc;
 //        }
 
-        calculateurs.put(port, nouveau_calc);
+        calculateurs.put(adresse, nouveau_calc);
         System.out.println(calculateurs.size() + " calculateur(s)");
         LOGGER.info("Calculateur courant : " + calculateurCourant.getPort());
         this.nouveauPort++;
         return nouveau_calc;
     }
 
-    private void cloudmipConnection() {
+    private OSClient cloudmipConnection() {
         LOGGER.info("Try to connect to cloudmip vm");
-	OSClient os = OSFactory.builder()
-	    .endpoint("http://195.220.53.61:5000/v2.0")
-	    .credentials("ens27","BTAAMU").tenantName("service")
-	    .authenticate();
+        OSClient os = OSFactory.builder()
+                .endpoint("http://195.220.53.61:5000/v2.0")
+                .credentials("ens27", "BTAAMU").tenantName("service")
+                .authenticate();
         LOGGER.info("Connection succeed");
-	System.out.println(os);
-	System.out.println(os.images().list());
+        System.out.println(os);
+        System.out.println(os.images().list());
 
-
+        return os;
     }
 
-    public void augmenterLaCharge() {
-        LOGGER.info("+ Charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
+    public synchronized void augmenterLaCharge() {
+        LOGGER.info("+ Charge du noeud " + calculateurs.get(calculateurCourant.getAdresse()) + " : " + calculateurs.get(calculateurCourant.getAdresse()).getCharge_courante());
         LOGGER.info("+ Charge du noeud : " + calculateurCourant.getCharge_courante());
         calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() + 1);
-        LOGGER.info("+ NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
+        LOGGER.info("+ NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getAdresse()) + " : " + calculateurs.get(calculateurCourant.getAdresse()).getCharge_courante());
         LOGGER.info("+ NOUVELLE charge du noeud : " + calculateurCourant.getCharge_courante());
     }
 
-    public void diminuerLaCharge() {
-        LOGGER.info("- Charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
+    public synchronized void diminuerLaCharge() {
+        LOGGER.info("- Charge du noeud " + calculateurs.get(calculateurCourant.getAdresse()) + " : " + calculateurs.get(calculateurCourant.getAdresse()).getCharge_courante());
         LOGGER.info("- Charge du noeud : " + calculateurCourant.getCharge_courante());
-        if(calculateurCourant.getCharge_courante() > 0) {
+        if (calculateurCourant.getCharge_courante() > 0) {
             calculateurCourant.setCharge_courante(calculateurCourant.getCharge_courante() - 1);
         }
-        LOGGER.info("- NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getPort()) + " : " + calculateurs.get(calculateurCourant.getPort()).getCharge_courante());
+        LOGGER.info("- NOUVELLE charge du noeud " + calculateurs.get(calculateurCourant.getAdresse()) + " : " + calculateurs.get(calculateurCourant.getAdresse()).getCharge_courante());
         LOGGER.info("- NOUVELLE charge du noeud : " + calculateurCourant.getCharge_courante());
     }
 
     /**
      * Permet au gestionnaire de définir quel calculateur doit être utilisé, il doit être utilisé depuis le calculateur courant du gestionnaire.
+     *
      * @throws NotEnoughtResourcesException
      */
-    public void choisirLeCalculateur() throws NotEnoughtResourcesException {
-        if (calculateurs.get(calculateurCourant.getPort()).getCharge_courante() >= 80. / 100.
-                * calculateurs.get(calculateurCourant.getPort()).getCharge_max()) {
+    public synchronized void choisirLeCalculateur() throws NotEnoughtResourcesException, MissingImageException {
+        if (calculateurs.get(calculateurCourant.getAdresse()).getCharge_courante() >= 80. / 100.
+                * calculateurs.get(calculateurCourant.getAdresse()).getCharge_max()) {
             changerLaRepartition();
         }
 
@@ -170,14 +224,14 @@ public class VMManager {
      *
      * @throws NotEnoughtResourcesException
      */
-    private void changerLaRepartition() throws NotEnoughtResourcesException {
-        Iterator<Integer> iterator = calculateurs.keySet().iterator();
+    private synchronized void changerLaRepartition() throws NotEnoughtResourcesException, MissingImageException {
+        Iterator<String> iterator = calculateurs.keySet().iterator();
         Boolean trouve = false;
-        Integer next = null;
+        String next = null;
         while (iterator.hasNext()) {
             next = iterator.next();
-            if (!(next.intValue() == calculateurCourant.getPort()) && calculateurs.get(next)
-                    .getCharge_courante() < 80 / 100 * calculateurs.get(calculateurCourant.getPort()).getCharge_max()) {
+            if (!(next.equals(calculateurCourant.getAdresse())) && calculateurs.get(next)
+                    .getCharge_courante() < 80 / 100 * calculateurs.get(calculateurCourant.getAdresse()).getCharge_max() && this.calculateurs.get(next).getState().equals(CalcState.OK)) {
                 calculateurCourant = calculateurs.get(next);
                 trouve = true;
             }
@@ -198,11 +252,11 @@ public class VMManager {
         VMManager.calculateurCourant = calculateurCourant;
     }
 
-    public static HashMap<Integer, InfoCalculateur> getCalculateurs() {
+    public synchronized static HashMap<String, InfoCalculateur> getCalculateurs() {
         return calculateurs;
     }
 
-    public static void setCalculateurs(HashMap<Integer, InfoCalculateur> calculateurs) {
+    public synchronized static void setCalculateurs(HashMap<String, InfoCalculateur> calculateurs) {
         VMManager.calculateurs = calculateurs;
     }
 

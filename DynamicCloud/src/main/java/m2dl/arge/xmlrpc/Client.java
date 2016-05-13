@@ -92,6 +92,8 @@ LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
 									LOGGER.severe(
 											"2: Un probleme est survenu, le calculateur doit �tre cr�� et ajout� au r�partiteur. Le calculateur actif dans le r�partiteur doit exister. Le r�partiteur doit �tre cr��. V�rifier la concordance des ports.");
 									e.printStackTrace();
+								} catch (Exception e) {
+									LOGGER.severe(e.getMessage());
 								}
 
 							}
