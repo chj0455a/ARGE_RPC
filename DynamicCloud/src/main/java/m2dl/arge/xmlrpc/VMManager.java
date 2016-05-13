@@ -99,6 +99,7 @@ public class VMManager {
             throw new MissingImageException("L'image jUb n'a pas été trouvée");
         }
 
+        server = os.compute().servers().get(server.getId());
 
 //        try {
 //        	LOGGER.severe(System.getProperties().get("user.dir").toString());
@@ -138,7 +139,7 @@ public class VMManager {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr();
+        String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr().toString();
         String id = server.getId();
         System.out.println(id + " " + adresse);
 
