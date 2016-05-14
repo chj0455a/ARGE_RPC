@@ -11,7 +11,10 @@ import org.openstack4j.model.compute.*;
 import org.openstack4j.model.compute.ext.DomainEntry;
 import org.openstack4j.openstack.OSFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -22,11 +25,14 @@ public class VMManager {
     private static VMManager instance;
     private static InfoCalculateur calculateurCourant;
     private static HashMap<String, InfoCalculateur> calculateurs;
+    private final PrintWriter writer;
     private int nouveauPort = 2012;
     private String derniereTraceDeProcess = "";
     private int nombreVM = 0;
 
-    private VMManager() throws MissingImageException {
+
+    private VMManager() throws MissingImageException, FileNotFoundException, UnsupportedEncodingException {
+        this.writer = new PrintWriter(new PrintWriter("VMManagerLog.txt", "UTF-8"), true);
         calculateurs = Maps.newHashMap();
         // Création d'un premier calculateur.
         creerCalculateur("127.0.0.1", this.nouveauPort);
@@ -58,7 +64,13 @@ public class VMManager {
 
     public static VMManager getGestionnaireRessource() throws MissingImageException {
         if (instance == null) {
-            instance = new VMManager();
+            try {
+                instance = new VMManager();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
         return instance;
     }
@@ -97,6 +109,15 @@ public class VMManager {
         } else {
             LOGGER.severe("L'image jUb n'a pas été trouvée");
             throw new MissingImageException("L'image jUb n'a pas été trouvée");
+        }
+
+        boolean wait = true;
+        while(wait) {
+            if(server.getStatus().equals(Server.Status.ACTIVE)) {
+                wait = false;
+            } else {
+                this.writer.println(server.getStatus().value());
+            }
         }
 
         server = os.compute().servers().get(server.getId());
@@ -139,6 +160,20 @@ public class VMManager {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+        for (List<? extends Address> adresse:
+        server.getAddresses().getAddresses().values()) {
+            for (Address addr:
+                 adresse) {
+                System.out.println(addr.getAddr());
+
+            }
+        }
+
+        Iterator<? extends Address> it = server.getAddresses().getAddresses().get("private").iterator();
+        while (it.hasNext())
+        {
+            System.out.println(it.next().getAddr());
+        }
         String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr().toString();
         String id = server.getId();
         System.out.println(id + " " + adresse);
