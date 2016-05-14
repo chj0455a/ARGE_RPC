@@ -117,6 +117,11 @@ public class VMManager {
                 wait = false;
             } else {
                 this.writer.println(server.getStatus().value());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -219,7 +224,7 @@ public class VMManager {
                 .authenticate();
         LOGGER.info("Connection succeed");
         System.out.println(os);
-        System.out.println(os.images().list());
+//        System.out.println(os.images().list());
 
         return os;
     }
