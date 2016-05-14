@@ -95,7 +95,7 @@ public class VMManager {
             // Create a Server Model Object
             ArrayList<String> networks = new ArrayList<>();
             networks.add("c1445469-4640-4c5a-ad86-9c0cb6650cca");
-            ServerCreate sc = Builders.server().name("JC_WN_" + this.nombreVM).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
+            ServerCreate sc = Builders.server().name("z_WN_" + this.nombreVM + "_" + new Date().toString()).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
 
             // Boot the Server
             server = os.compute().servers().bootAndWaitActive(sc, 120);
