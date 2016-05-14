@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -95,6 +96,7 @@ public class VMManager {
             // Create a Server Model Object
             ArrayList<String> networks = new ArrayList<>();
             networks.add("c1445469-4640-4c5a-ad86-9c0cb6650cca");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
             ServerCreate sc = Builders.server().name("z_WN_" + this.nombreVM + "_" + new Date().toString()).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
 
             // Boot the Server
@@ -115,7 +117,7 @@ public class VMManager {
         while(wait) {
             this.writer.println("5 : " + os.compute().servers().get(server.getId()).getStatus().value());
             this.writer.println("6 : " + os.compute().servers().get(server.getId()).getImage().getName());
-            if(!os.compute().servers().get(server.getId()).getStatus().equals(Server.Status.ACTIVE)) {
+            if(os.compute().servers().get(server.getId()).getStatus().equals(Server.Status.ACTIVE)) {
                 wait = false;
             } else {
                 try {
