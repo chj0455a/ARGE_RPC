@@ -33,7 +33,7 @@ public class VMManager {
 
 
     private VMManager() throws MissingImageException, FileNotFoundException, UnsupportedEncodingException {
-        this.writer = new PrintWriter(new PrintWriter("VMManagerLog.txt", "UTF-8"), true);
+        this.writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
         calculateurs = Maps.newHashMap();
         // Création d'un premier calculateur.
         creerCalculateur("127.0.0.1", this.nouveauPort);
@@ -100,7 +100,7 @@ public class VMManager {
             ServerCreate sc = Builders.server().name("z_WN_" + this.nombreVM + "_" + df.format(new Date())).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
 
             // Boot the Server
-            server = os.compute().servers().bootAndWaitActive(sc, 120);
+            server = os.compute().servers().boot(sc);
 
             // Créer une addresse ip privée
             // Créer la vm
@@ -112,6 +112,9 @@ public class VMManager {
             LOGGER.severe("L'image jUb n'a pas été trouvée");
             throw new MissingImageException("L'image jUb n'a pas été trouvée");
         }
+
+//server = os.compute().servers().get(server.getId());
+
 
         boolean wait = true;
         while(wait) {
@@ -128,9 +131,7 @@ public class VMManager {
             }
         }
 
-
-        server = os.compute().servers().get(server.getId());
-
+server = os.compute().servers().get(server.getId());
 //        try {
 //        	LOGGER.severe(System.getProperties().get("user.dir").toString());
 //String path = System.getProperties().get("user.dir").toString().replace("\\", "/") + "/";
@@ -178,12 +179,7 @@ public class VMManager {
             }
         }
 
-        Iterator<? extends Address> it = server.getAddresses().getAddresses().get("private").iterator();
-        while (it.hasNext())
-        {
-            this.writer.println("2 : " + it.next().getAddr());
-        }
-        String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr().toString();
+       String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr().toString();
         String id = server.getId();
         System.out.println(id + " " + adresse);
 
