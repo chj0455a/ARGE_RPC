@@ -113,10 +113,11 @@ public class VMManager {
 
         boolean wait = true;
         while(wait) {
-            if(server.getStatus().equals(Server.Status.ACTIVE)) {
+            this.writer.println(os.compute().servers().get(server.getId()).getStatus().value());
+            this.writer.println(os.compute().servers().get(server.getId()).getImage().getName());
+            if(!os.compute().servers().get(server.getId()).getStatus().equals(Server.Status.ACTIVE)) {
                 wait = false;
             } else {
-                this.writer.println(server.getStatus().value());
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -124,6 +125,7 @@ public class VMManager {
                 }
             }
         }
+
 
         server = os.compute().servers().get(server.getId());
 
@@ -169,7 +171,7 @@ public class VMManager {
         server.getAddresses().getAddresses().values()) {
             for (Address addr:
                  adresse) {
-                System.out.println(addr.getAddr());
+                this.writer.println("1 : " + addr.getAddr());
 
             }
         }
@@ -177,7 +179,7 @@ public class VMManager {
         Iterator<? extends Address> it = server.getAddresses().getAddresses().get("private").iterator();
         while (it.hasNext())
         {
-            System.out.println(it.next().getAddr());
+            this.writer.println("2 : " + it.next().getAddr());
         }
         String adresse = server.getAddresses().getAddresses().get("private").get(0).getAddr().toString();
         String id = server.getId();
