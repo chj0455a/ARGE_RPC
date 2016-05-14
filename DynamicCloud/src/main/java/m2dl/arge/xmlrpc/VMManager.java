@@ -96,8 +96,8 @@ public class VMManager {
             // Create a Server Model Object
             ArrayList<String> networks = new ArrayList<>();
             networks.add("c1445469-4640-4c5a-ad86-9c0cb6650cca");
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-            ServerCreate sc = Builders.server().name("z_WN_" + this.nombreVM + "_" + new Date().toString()).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            ServerCreate sc = Builders.server().name("z_WN_" + this.nombreVM + "_" + df.format(new Date())).networks(networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
 
             // Boot the Server
             server = os.compute().servers().bootAndWaitActive(sc, 120);
