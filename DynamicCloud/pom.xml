@@ -53,6 +53,7 @@
 			<groupId>org.fusesource</groupId>
 			<artifactId>sigar</artifactId>
 			<version>1.6.4</version>
+			<systemPath>${basedir}/src/main/resources/lib/sigar.jar</systemPath>
 		</dependency>
 
 	</dependencies>

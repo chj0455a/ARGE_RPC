@@ -103,7 +103,7 @@ public class Calculateur {
             se.printStackTrace();
         }
 
-
+System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
         writer.println(mem.getUsedPercent() + "\t");
         writer.println((cpuperc.getCombined() * 100) + "\t");
         writer.println(filesystemusage.getUsePercent() + "\n");
