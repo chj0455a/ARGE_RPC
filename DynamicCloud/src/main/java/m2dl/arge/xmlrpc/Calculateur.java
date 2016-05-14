@@ -5,12 +5,15 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
+import org.hyperic.sigar.*;
 
 import java.io.IOException;
-import java.net.BindException;
+import java.io.PrintWriter;
 
 public class Calculateur {
     private static int monPort = 0;
+    private static Sigar sigar;
+    private static PrintWriter writer;
 
     public int add(int i1, int i2) throws InterruptedException {
         int nbDivisibles = 0;
@@ -23,12 +26,34 @@ public class Calculateur {
         return monPort;
     }
 
+    public double getCPUCharge() {
+        Mem mem = null;
+        CpuPerc cpuperc = null;
+        FileSystemUsage filesystemusage = null;
+        try {
+            mem = sigar.getMem();
+            cpuperc = sigar.getCpuPerc();
+            filesystemusage = sigar.getFileSystemUsage("C:");
+        } catch (SigarException se) {
+            se.printStackTrace();
+        }
+
+
+        writer.print(mem.getUsedPercent() + "\t");
+        writer.print((cpuperc.getCombined() * 100) + "\t");
+        writer.print(filesystemusage.getUsePercent() + "\n");
+        return cpuperc.getCombined() * 100;
+    }
+
     public int subtract(int i1, int i2) {
         return i1 - i2;
     }
 
     public static void main(String[] args) throws IOException, XmlRpcException {
+        writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
+
         if (args[0] != null) {
+            sigar = new Sigar();
             try {
                 monPort = Integer.parseInt(args[0]);
 //				try {
@@ -41,7 +66,7 @@ public class Calculateur {
 
                 PropertyHandlerMapping phm = new PropertyHandlerMapping();
                     /*
-					 * Load handler definitions from a property file. The
+                     * Load handler definitions from a property file. The
 					 * property file might look like:
 					 * Calculator=org.apache.xmlrpc.demo.Calculator
 					 * org.apache.xmlrpc.demo.proxy.Adder=org.apache.xmlrpc.demo
@@ -64,7 +89,27 @@ public class Calculateur {
                 serverConfig.setContentLengthOptional(false);
 
                 webServer.start();
-                System.out.println("Le Worker Node web a demarre ...");
+                writer.println("Le Worker Node web a demarre ...");
+
+
+                Mem mem = null;
+        CpuPerc cpuperc = null;
+        FileSystemUsage filesystemusage = null;
+        try {
+            mem = sigar.getMem();
+            cpuperc = sigar.getCpuPerc();
+            filesystemusage = sigar.getFileSystemUsage("C:");
+        } catch (SigarException se) {
+            se.printStackTrace();
+        }
+
+
+        writer.println(mem.getUsedPercent() + "\t");
+        writer.println((cpuperc.getCombined() * 100) + "\t");
+        writer.println(filesystemusage.getUsePercent() + "\n");
+
+
+
 //				} catch (BindException e) {
 //					String[] argsTemp = new String[1];
 //					argsTemp[0] = (Integer.parseInt(args[0]) + 1) + "" ;
@@ -72,7 +117,7 @@ public class Calculateur {
 //				}
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                System.out.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
+                writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
             }
         }
