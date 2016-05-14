@@ -113,8 +113,8 @@ public class VMManager {
 
         boolean wait = true;
         while(wait) {
-            this.writer.println(os.compute().servers().get(server.getId()).getStatus().value());
-            this.writer.println(os.compute().servers().get(server.getId()).getImage().getName());
+            this.writer.println("5 : " + os.compute().servers().get(server.getId()).getStatus().value());
+            this.writer.println("6 : " + os.compute().servers().get(server.getId()).getImage().getName());
             if(!os.compute().servers().get(server.getId()).getStatus().equals(Server.Status.ACTIVE)) {
                 wait = false;
             } else {
