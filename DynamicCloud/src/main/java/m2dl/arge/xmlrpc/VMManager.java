@@ -38,6 +38,7 @@ public class VMManager {
             /************** CONNEXION AU REPARTITEUR **************/
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             // config.setServerURL(new URL("http://127.0.0.1:8080/xmlrpc"));
+            args[0] = (args[0].equals("localhost")) ? "127.0.0.1" : args[0];
             config.setServerURL(new URL("http://" + args[0] + ":" + args[1] + "/xmlrpc"));
             config.setEnabledForExtensions(true);
             config.setConnectionTimeout(60 * 1000);
