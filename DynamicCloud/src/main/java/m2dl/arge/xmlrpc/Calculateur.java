@@ -9,6 +9,7 @@ import org.hyperic.sigar.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 
 public class Calculateur {
     private static int monPort = 0;
@@ -112,8 +113,9 @@ public class Calculateur {
 System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
         writer.println(mem.getUsedPercent() + "\t");
         writer.println((cpuperc.getCombined() * 100) + "\t");
-        System.out.println(sigar.getProcCpu(java.lang.management.ManagementFactory.getRuntimeMXBean().getName()).getPercent());
-//        writer.println(filesystemusage.getUsePercent() + "\n");
+                String name = ManagementFactory.getRuntimeMXBean().getName();
+                System.out.println(sigar.getProcCpu(Long.parseLong(name.split("@")[0])).getPercent());
+//        writer.println(filesystemusage.getUsePercent() + p"\n");
 
 
 
