@@ -99,6 +99,11 @@ public class Calculateur {
             Sigar sigart = new Sigar();
             mem = sigart.getMem();
             cpuperc = sigart.getCpuPerc();
+            FileSystem[] res = sigar.getFileSystemList();
+            for(int i = 0; i < res.length; i++) {
+                writer.println(res[i].getDirName());
+                System.out.println(res[i].getDirName());
+            }
             filesystemusage = sigart.getFileSystemUsage("C:");
         } catch (SigarException se) {
             se.printStackTrace();
