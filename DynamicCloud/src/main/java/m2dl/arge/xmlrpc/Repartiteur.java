@@ -35,7 +35,7 @@ public class Repartiteur {
     public static void main(String[] args) throws Exception {
         System.out.println("Repartiteur nouvelle version2");
         writer = new PrintWriter(new PrintWriter("logRepartiteur.txt", "UTF-8"), true);
-        if (args[0] != null && args[1] != null && (args[1].equals("local") || args[1].equals("cloudmip"))) {
+        if (args[0] != null) {
             calculateursLoadBalancing = new ArrayList<>();
             // Le Repartiteur ne doit pas être intelligent : c'est le VMManager qui va gérer cet attribut
 
