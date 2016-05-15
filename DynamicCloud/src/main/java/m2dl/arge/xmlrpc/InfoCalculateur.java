@@ -8,20 +8,20 @@ public class InfoCalculateur {
 
 	private String adresse;
 	private XmlRpcClient client;
-	private int charge_courante;
+	private double charge_courante;
 	private int charge_max;
 	private int port;
     private CalcState state;
     private String id;
 
-    public InfoCalculateur(XmlRpcClient client, int charge_courante, int charge_max, int port, String adresse, String id) {
+    public InfoCalculateur(XmlRpcClient client, double charge_courante, int charge_max, int port, String adresse, String id, CalcState etat) {
 		super();
 		this.client = client;
 		this.charge_courante = charge_courante;
 		this.charge_max = charge_max;
 		this.port = port;
 		this.adresse = adresse;
-        this.state = CalcState.OK;
+        this.state = etat;
         this.id = id;
 	}
 
@@ -33,11 +33,11 @@ public class InfoCalculateur {
 		this.client = client;
 	}
 
-	public int getCharge_courante() {
+	public double getCharge_courante() {
 		return charge_courante;
 	}
 
-	public void setCharge_courante(int charge_courante) {
+	public void setCharge_courante(double charge_courante) {
 		this.charge_courante = charge_courante;
 	}
 

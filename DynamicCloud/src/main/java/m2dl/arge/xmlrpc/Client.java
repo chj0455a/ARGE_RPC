@@ -118,8 +118,9 @@ LOGGER.info(arg0.toString() + "\n" + arg1.toString() + "\n\n");
 					// V�rifier la concordance des ports.");
 					// e.printStackTrace();
 					// }
-					Thread.sleep(10000);
+					Thread.sleep(60000);
 				}
+				break;
 			}
 		}
 

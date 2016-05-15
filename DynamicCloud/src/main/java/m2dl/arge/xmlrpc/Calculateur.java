@@ -83,6 +83,7 @@ public class Calculateur {
 
                 webServer.start();
                 writer.println("Le Worker Node web a demarre ...");
+                System.out.println("Le Worker Node web a demarre ...");
 
 
                 Mem mem = null;

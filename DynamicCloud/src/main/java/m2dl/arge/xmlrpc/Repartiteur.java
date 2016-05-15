@@ -1,123 +1,259 @@
 package m2dl.arge.xmlrpc;
 
 
-
-
-import java.util.HashMap;
-import java.util.Scanner;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.xmlrpc.XmlRpcException;
 //  import org.apache.xmlrpc.demo.webserver.proxy.impls.AdderImpl;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 public class Repartiteur {
-	private static Logger LOGGER = Logger.getLogger("Repartiteur");
-	private static final int port = 8080;
-	
-	private static VMManager vMManager;
-	private static HashMap<String, InfoCalculateur> calculateursForLoadBalancing;
+    private static final double LIMIT = 400.00;
+    private static Logger LOGGER = Logger.getLogger("Repartiteur");
+    private static final int port = 8080;
 
-	public static void main(String[] args) throws Exception {
-		System.out.println("Repartiteur nouvelle version2");
-		if (args[0] != null) {
-			vMManager = VMManager.getGestionnaireRessource();
+    private static VMManager vMManager;
+    public static List<InfoCalculateur> calculateursLoadBalancing;
+    private static PrintWriter writer;
+    public static int calcIndexLoadBalance = 0;
+    public static int toto = 0;
 
-			WebServer webServer = new WebServer(Integer.parseInt(args[0]));
 
-			XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
+    public static void main(String[] args) throws Exception {
+        System.out.println("Repartiteur nouvelle version2");
+        writer = new PrintWriter(new PrintWriter("logRepartiteur.txt", "UTF-8"), true);
+        if (args[0] != null && args[1] != null && (args[1].equals("local") || args[1].equals("cloudmip"))) {
+            calculateursLoadBalancing = new ArrayList<>();
+            // Le Repartiteur ne doit pas être intelligent : c'est le VMManager qui va gérer cet attribut
 
-			PropertyHandlerMapping phm = new PropertyHandlerMapping();
-			phm.load(Thread.currentThread().getContextClassLoader(), "XmlRpcServlet.properties");
-			xmlRpcServer.setHandlerMapping(phm);
-			XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
-			serverConfig.setEnabledForExtensions(true);
-			serverConfig.setContentLengthOptional(false);
+            WebServer webServer = new WebServer(Integer.parseInt(args[0]));
 
-			webServer.start();
-			System.out.println("Le repartiteur a d�marr� ...");
-		}
-		while (true) {
-			System.out.print("Mise � jour ? > ");
-			String input = new Scanner(System.in).nextLine();
-			// update_repartiteur pascompris pascompris add 127.0.0.1 2012
-			String[] params = input.split("\\s+");
-			for (String string : params) {
-				System.out.println(string);
-			}
-			if (params.length != 6) {
-				System.out.println(
-						"Usage : update_repartiteur <machine> <portRepartiteur> <add/delete> <machine � ajouter/supprimer> <nouveauPort>");
-			} else {
-				if (params[3].equals("add")) {
-					if (vMManager.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
-						System.out.println("Impossible d'associer le nouveau WN : le port est d�j� utilis�");
-					} else {
-						vMManager.creerCalculateur(params[4], Integer.parseInt(params[5]));
-					}
-				} else if (params[3].equals("del")) {
-					if (!vMManager.getCalculateurs().containsKey(Integer.parseInt(params[5]))) {
-						System.out.println("Impossible de supprimer le WN : l'association n'existe pas");
-					} else {
-						supprimerCalculateur(params[4], Integer.parseInt(params[5]));
-					}
-				}
-			}
-		}
-	}
+            XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
 
-	private synchronized static void supprimerCalculateur(String machine, int port) {
-		LOGGER.info("Suppression d'une association � un calculateur");
-		System.out.println(vMManager.getCalculateurs().size() + " calculateur(s)");
-		vMManager.getCalculateurs().remove(port);
-		if (vMManager.getCalculateurs().size() == 0) {
-			vMManager.setCalculateurCourant(null);
-		} else {
-			vMManager.setCalculateurCourant(vMManager.getCalculateurs().get(vMManager.getCalculateurs().keySet().iterator().next()));
-		}
-		System.out.println(vMManager.getCalculateurs().size() + " calculateur(s)");
-	}
+            PropertyHandlerMapping phm = new PropertyHandlerMapping();
+            phm.load(Thread.currentThread().getContextClassLoader(), "XmlRpcServlet.properties");
+            xmlRpcServer.setHandlerMapping(phm);
+            XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
+            serverConfig.setEnabledForExtensions(true);
+            serverConfig.setContentLengthOptional(false);
 
-	
+            webServer.start();
+            System.out.println("Le repartiteur a d�marr� ...");
+            while (true) {
+                int i = 1;
+            }
+        }
+    }
 
-//	public int add(int i1, int i2) throws NotEnoughtResourcesException {
-	public String add(int i1, int i2) throws NotEnoughtResourcesException, MissingImageException {
-		LOGGER.severe("!!!!!!!!!!!!!!!!!!!!!" + i1 + " " + i2);
-		int res = 0;
-		try {
-			res = this.transmettreLaRequete(i1);
-		} catch (XmlRpcException e) {
-			e.printStackTrace();
-		} catch (NotEnoughtResourcesException e) {
-			e.printStackTrace();
-		}
+    public void creerCalculateur(String adresse, int port) throws MalformedURLException {
+        System.out.println(this.calculateursLoadBalancing.size() + " calculateur(s)");
+        // Ajout de la référence vers le nouveau calculateur
+        LOGGER.info("Ajout d'une association � un calculateur");
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+//            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
+        config.setServerURL(new URL("http://" + adresse + ":" + port + "/calculateur"));
+        config.setEnabledForExtensions(true);
+        config.setConnectionTimeout(60 * 1000);
+        config.setReplyTimeout(60 * 1000);
+
+        XmlRpcClient client = new XmlRpcClient();
+
+        // use Commons HttpClient as transport
+        client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
+        // set configuration
+        client.setConfig(config);
+
+        InfoCalculateur nouveau_calc = new InfoCalculateur(client, 0, 500, port, adresse, null, CalcState.OK);
+        this.calculateursLoadBalancing.add(nouveau_calc);
+        System.out.println(this.calculateursLoadBalancing.size() + " calculateur(s)");
+    }
+
+    public synchronized void supprimerCalculateur(String machine, int port) {
+        LOGGER.info("Suppression d'une association � un calculateur");
+        System.out.println(calculateursLoadBalancing.size() + " calculateur(s)");
+
+        InfoCalculateur calcToRemove = null;
+        for (InfoCalculateur calculateur :
+                calculateursLoadBalancing) {
+            if (calculateur.getAdresse().equals(machine) && calculateur.getPort() == port) {
+                calcToRemove = calculateur;
+            }
+        }
+
+        calculateursLoadBalancing.remove(calcToRemove);
+        System.out.println(calculateursLoadBalancing.size() + " calculateur(s)");
+    }
+
+
+    //	public int add(int i1, int i2) throws CalculatorsManagementException {
+    public String add(int i1, int i2) throws CalculatorsManagementException, MissingImageException,
+            NotEnoughtResourceException {
+        LOGGER.severe("!!!!!!!!!!!!!!!!!!!!!" + i1 + " " + i2);
+        int res = 0;
+        try {
+            res = transmettreLaRequete(i1);
+        } catch (XmlRpcException e) {
+            e.printStackTrace();
+        } catch (CalculatorsManagementException e) {
+            e.printStackTrace();
+        }
 //		return res;
-		LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + vMManager.getCalculateurCourant().getPort() + ". Sa charge : " + vMManager.getCalculateurCourant().getCharge_courante() + "/" + vMManager.getCalculateurCourant().getCharge_max() + " RES : " + res);
-		return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1==i2) + "Calc courant : " + vMManager.getCalculateurCourant().getPort() + ". Sa charge : " + vMManager.getCalculateurCourant().getCharge_courante() + "/" + vMManager.getCalculateurCourant().getCharge_max() + " RES : " + res;
-	}
+        LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1 == i2) + "Calc courant : " +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getPort() + ". Sa charge : " +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_courante() + "/" +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_max() + " RES : " + res);
+        return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1 == i2) + "Calc courant : " +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getPort() + ". Sa charge : " +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_courante() + "/" +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_max() + " RES : " + res;
+    }
 
-	private synchronized int transmettreLaRequete(int i) throws XmlRpcException, NotEnoughtResourcesException, MissingImageException {
-		LOGGER.info("Transmission de requ�te.");
-		try {
-			vMManager.choisirLeCalculateur();
-			// make the a regular call
-			Object[] params = new Object[] { new Integer(i), new Integer(3) };
-			vMManager.augmenterLaCharge();
+    public synchronized int transmettreLaRequete(int i) throws XmlRpcException, CalculatorsManagementException,
+            MissingImageException, NotEnoughtResourceException {
+        LOGGER.info("Transmission de requ�te.");
+        // TODO : PLUS BESOIN
+//			vMManager.choisirLeCalculateur();
+        // make the a regular call
+        // Choisir le calculateur
+        Integer result = null;
+        if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
+            InfoCalculateur calculateur = choisirCalculateur();
+
+            calculateur.setCharge_courante(calculateur.getCharge_courante() + 1.);
+            Object[] params = new Object[]{new Integer(i), new Integer(3)};
 //			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
-			Integer result = (Integer) vMManager.getCalculateurCourant().getClient().execute("Calculateur.add", params);
-			LOGGER.info("RESULTAT : " + result);
-			vMManager.diminuerLaCharge();
-			return result;
-		} catch (NotEnoughtResourcesException e) {
-			throw e;
-		}
-	}
-	
 
-	public int subtract(int i1, int i2) {
-		return i1 - i2;
-	}
+
+            // TODO CHANGEMENT EN LOAD BALANCE
+            System.out.println
+                    ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
+            writer.println
+                    ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
+            result = (Integer) calculateur.getClient().execute("Calculateur.add", params);
+
+            calcIndexLoadBalance = (calcIndexLoadBalance + 1) % calculateursLoadBalancing.size();
+
+            LOGGER.info("RESULTAT : " + result);
+            if (calculateur.getCharge_courante() >= 0) {
+                calculateur.setCharge_courante(calculateur.getCharge_courante() - 1.);
+            }
+        }
+        if (result == null) {
+            throw new CalculatorsManagementException("Mauvaise gestion des calculateurs");
+        }
+        return result;
+    }
+
+    public InfoCalculateur choisirCalculateur() throws NotEnoughtResourceException {
+        LOGGER.info("CHOISIR le calculateur");
+        InfoCalculateur choosenCalc = null;
+
+        System.out.println("taille calc : " + calculateursLoadBalancing.size());
+        writer.println("taille calc : " + calculateursLoadBalancing.size());
+        // DEBUG
+        for (InfoCalculateur calc :
+                calculateursLoadBalancing) {
+            System.out.println(calc.getAdresse());
+            writer.println(calc.getAdresse());
+            System.out.println(calc.getPort());
+            writer.println(calc.getPort());
+            System.out.println(calc.getCharge_courante());
+            writer.println(calc.getCharge_courante());
+            System.out.println(calc.getCharge_max());
+            writer.println(calc.getCharge_max());
+            System.out.println(calc.getState());
+            writer.println(calc.getState());
+        }
+        //
+
+        for (int i = 0; i < calculateursLoadBalancing.size(); i++) {
+            InfoCalculateur infoCalculateur = calculateursLoadBalancing.get((calcIndexLoadBalance + i) %
+                    calculateursLoadBalancing.size());
+            if (infoCalculateur.getCharge_courante() < LIMIT && infoCalculateur.getState().equals(CalcState.OK)) {
+                choosenCalc = infoCalculateur;
+                break;
+            }
+        }
+        if (choosenCalc == null) {
+            // Le Repartiteur est bête, si pas assez de ressource, ce n'est pas à lui de déclencher la création d'un
+            // calculateur, même via le VMManager
+            throw new NotEnoughtResourceException("Tout les calculateurs sont saturés");
+        }
+        return choosenCalc;
+    }
+
+    public List<InfoCalculateur> getCalculateursLoadBalancing() {
+        return calculateursLoadBalancing;
+    }
+
+    public int getCalcIndexLoadBalance() {
+        return calcIndexLoadBalance;
+    }
+
+    public void setCalculateursLoadBalancing(List<InfoCalculateur> calculateursLoadBalancing) {
+        this.calculateursLoadBalancing = calculateursLoadBalancing;
+    }
+
+    public void setCalcIndexLoadBalance(int calcIndexLoadBalance) {
+        this.calcIndexLoadBalance = calcIndexLoadBalance;
+    }
+
+    public int linkRequest(String requete, String adresseCalc, String portCalc) throws MalformedURLException {
+        System.out.print("Mise � jour ? > ");
+        // update_repartiteur pascompris pascompris add 127.0.0.1 2012
+        toto = Integer.parseInt(portCalc);
+        List<String> adresses = getUsedAddresses();
+        if (requete.equals("add")) {
+            if (adresses.contains(Integer.parseInt(portCalc))) {
+                System.out.println("Impossible d'associer le nouveau WN : le port est d�j� utilis�");
+                return 1;
+            } else {
+                creerCalculateur(adresseCalc, Integer.parseInt(portCalc));
+                return 2;
+            }
+        } else if (requete.equals("del")) {
+            if (!adresses.contains(Integer.parseInt(portCalc))) {
+                System.out.println("Impossible de supprimer le WN : l'association n'existe pas");
+                return 3;
+            } else {
+                supprimerCalculateur(adresseCalc, Integer.parseInt(portCalc));
+                return 4;
+            }
+        }
+        return 1;
+    }
+
+    public List<String> getUsedAddresses() {
+        return (List<String>) CollectionUtils.collect(calculateursLoadBalancing,
+                new BeanToPropertyValueTransformer("port"));
+    }
+
+    public static void setWriter(PrintWriter writer) {
+        Repartiteur.writer = writer;
+    }
+
+    public Repartiteur getRepartiteurInstance() {
+        return this;
+    }
+
+    public boolean addCalculateur(InfoCalculateur infoCalculateur) {
+        return this.calculateursLoadBalancing.add(infoCalculateur);
+    }
+
+    public boolean removeCalculateur(InfoCalculateur infoCalculateur) {
+        return this.calculateursLoadBalancing.remove(infoCalculateur);
+    }
 }

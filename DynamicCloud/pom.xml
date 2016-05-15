@@ -54,8 +54,19 @@
 			<artifactId>sigar</artifactId>
 			<version>1.6.4</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.0</version>
+		</dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.8.3</version>
+        </dependency>
 
-	</dependencies>
+
+    </dependencies>
 	<build>
 		<finalName>DynamicCloud</finalName>
 		<plugins>
@@ -163,9 +174,9 @@
 							<name>Client</name>
 						</program>
 						<program>
-							<mainClass>m2dl.arge.xmlrpc.OsLi</mainClass>
-							<id>OsLi</id>
-							<name>OsLi</name>
+							<mainClass>m2dl.arge.xmlrpc.UpdateRepartiteur</mainClass>
+							<id>UpdateRepartiteur</id>
+							<name>UpdateRepartiteur</name>
 						</program>
 					</programs>
 				</configuration>
