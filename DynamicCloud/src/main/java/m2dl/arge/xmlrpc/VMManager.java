@@ -55,11 +55,14 @@ public class VMManager {
 
             Object[] params = new Object[]{};
             repartiteur = (Repartiteur) repartiteurClient.execute("Repartiteur.getRepartiteurInstance", params);
-
+		if(repartiteur != null) {
+			System.out.println("LeVMManager est à l'écoute du répartiteur.");
+		}
 
             writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
             calculateurs = (List<InfoCalculateur>) repartiteurClient.execute("Repartiteur.getCalculateursLoadBalancing", params);
             // Création d'un premier calculateur.
+		System.out.println("Création du premier calulateur.");
             creerCalculateur("127.0.0.1", nouveauPort);
 
 
@@ -108,7 +111,10 @@ public class VMManager {
 //                }
 //            }
 //        };
-        }
+        } else {
+	System.out.println("Erreur : usage -> ./VMManager <adresse du repartiteur> <port du repartiteur>");
+	}
+}
     }
 
     private synchronized void deleteVM(InfoCalculateur calc) {
