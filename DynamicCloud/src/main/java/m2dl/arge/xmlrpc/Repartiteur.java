@@ -3,6 +3,7 @@ package m2dl.arge.xmlrpc;
 
 
 
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ public class Repartiteur {
 	private static final int port = 8080;
 	
 	private static VMManager vMManager;
+	private static HashMap<String, InfoCalculateur> calculateursForLoadBalancing;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Repartiteur nouvelle version2");
