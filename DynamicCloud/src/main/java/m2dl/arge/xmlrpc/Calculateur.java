@@ -53,7 +53,7 @@ public class Calculateur {
         writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
 
         if (args[0] != null) {
-            sigar = new Sigar();
+
             try {
                 monPort = Integer.parseInt(args[0]);
 //				try {
@@ -96,9 +96,10 @@ public class Calculateur {
         CpuPerc cpuperc = null;
         FileSystemUsage filesystemusage = null;
         try {
-            mem = sigar.getMem();
-            cpuperc = sigar.getCpuPerc();
-            filesystemusage = sigar.getFileSystemUsage("C:");
+            Sigar sigart = new Sigar();
+            mem = sigart.getMem();
+            cpuperc = sigart.getCpuPerc();
+            filesystemusage = sigart.getFileSystemUsage("C:");
         } catch (SigarException se) {
             se.printStackTrace();
         }
