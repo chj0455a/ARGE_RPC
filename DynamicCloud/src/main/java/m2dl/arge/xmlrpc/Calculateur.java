@@ -28,21 +28,13 @@ public class Calculateur {
     }
 
     public double getCPUCharge() {
-        Mem mem = null;
         CpuPerc cpuperc = null;
-        FileSystemUsage filesystemusage = null;
         try {
-            mem = sigar.getMem();
             cpuperc = sigar.getCpuPerc();
-            filesystemusage = sigar.getFileSystemUsage("C:");
         } catch (SigarException se) {
             se.printStackTrace();
         }
-
-
-        writer.print(mem.getUsedPercent() + "\t");
         writer.print((cpuperc.getCombined() * 100) + "\t");
-        writer.print(filesystemusage.getUsePercent() + "\n");
         return cpuperc.getCombined() * 100;
     }
 
@@ -76,7 +68,7 @@ public class Calculateur {
                 phm.load(Thread.currentThread().getContextClassLoader(), "XmlRpcCalculator.properties");
 
 					/*
-					 * You may also provide the handler classes directly, like
+                     * You may also provide the handler classes directly, like
 					 * this: phm.addHandler("Calculator",
 					 * org.apache.xmlrpc.demo.Calculator.class);
 					 * phm.addHandler(org.apache.xmlrpc.demo.proxy.Adder.class.
@@ -94,40 +86,29 @@ public class Calculateur {
 
 
                 Mem mem = null;
-        CpuPerc cpuperc = null;
-        FileSystemUsage filesystemusage = null;
-        try {
-            sigar = new Sigar();
-            mem = sigar.getMem();
-            cpuperc = sigar.getCpuPerc();
-            FileSystem[] res = Calculateur.sigar.getFileSystemList();
-            for(int i = 0; i < res.length; i++) {
-                writer.println(res[i].getDirName());
-                System.out.println(res[i].getDirName());
-            }
-//            filesystemusage = sigar.getFileSystemUsage("C:");
-        } catch (SigarException se) {
-            se.printStackTrace();
-        }
-
-
-                new Thread() {
-                    @Override
-                    public void run() {
-                        int x = 2;
-                        while(true) {
-                            x *= x;
-                        }
+                CpuPerc cpuperc = null;
+                FileSystemUsage filesystemusage = null;
+                try {
+                    sigar = new Sigar();
+                    mem = sigar.getMem();
+                    cpuperc = sigar.getCpuPerc();
+                    FileSystem[] res = Calculateur.sigar.getFileSystemList();
+                    for (int i = 0; i < res.length; i++) {
+                        writer.println(res[i].getDirName());
+                        System.out.println(res[i].getDirName());
                     }
-                };
-Thread.sleep(5000);
+//            filesystemusage = sigar.getFileSystemUsage("C:");
+                } catch (SigarException se) {
+                    se.printStackTrace();
+                }
+
+
                 System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
-        writer.println(mem.getUsedPercent() + "\t");
-        writer.println((cpuperc.getCombined() * 100) + "\t");
+                writer.println(mem.getUsedPercent() + "\t");
+                writer.println((cpuperc.getCombined() * 100) + "\t");
                 String name = ManagementFactory.getRuntimeMXBean().getName();
                 System.out.println(sigar.getProcCpu(Long.parseLong(name.split("@")[0])).getPercent());
 //        writer.println(filesystemusage.getUsePercent() + p"\n");
-
 
 
 //				} catch (BindException e) {
@@ -140,8 +121,6 @@ Thread.sleep(5000);
                 writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
             } catch (SigarException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
