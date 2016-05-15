@@ -178,6 +178,11 @@
 							<id>UpdateRepartiteur</id>
 							<name>UpdateRepartiteur</name>
 						</program>
+						<program>
+							<mainClass>m2dl.arge.xmlrpc.VMManager</mainClass>
+							<id>VMManager</id>
+							<name>VMManager</name>
+						</program>
 					</programs>
 				</configuration>
 			</plugin>
