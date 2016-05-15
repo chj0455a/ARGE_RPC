@@ -4,7 +4,9 @@ package m2dl.arge.xmlrpc;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 
-public class InfoCalculateur {
+import java.io.Serializable;
+
+public class InfoCalculateur implements Serializable {
 
 	private String adresse;
 	private XmlRpcClient client;
