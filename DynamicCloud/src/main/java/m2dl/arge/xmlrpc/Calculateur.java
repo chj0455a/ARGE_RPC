@@ -104,7 +104,7 @@ public class Calculateur {
                 writer.println(res[i].getDirName());
                 System.out.println(res[i].getDirName());
             }
-            filesystemusage = sigar.getFileSystemUsage("C:");
+//            filesystemusage = sigar.getFileSystemUsage("C:");
         } catch (SigarException se) {
             se.printStackTrace();
         }
@@ -112,7 +112,8 @@ public class Calculateur {
 System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
         writer.println(mem.getUsedPercent() + "\t");
         writer.println((cpuperc.getCombined() * 100) + "\t");
-        writer.println(filesystemusage.getUsePercent() + "\n");
+        System.out.println(sigar.getProcCpu(java.lang.management.ManagementFactory.getRuntimeMXBean().getName()).getPercent());
+//        writer.println(filesystemusage.getUsePercent() + "\n");
 
 
 
@@ -125,6 +126,8 @@ System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-
                 e.printStackTrace();
                 writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
+            } catch (SigarException e) {
+                e.printStackTrace();
             }
         }
     }
