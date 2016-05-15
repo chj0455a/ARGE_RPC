@@ -157,6 +157,12 @@ public class Repartiteur {
         return result;
     }
 
+    /**
+     * Le Répartiteur a un brin d'intelligence : il est censé redistribué la charge aux calculateurs moins encombrés
+     * si certain sont trop chargés au lieu de faire du roundrobin pur et dur
+     * @return InfoCalculateur
+     * @throws NotEnoughtResourceException
+     */
     public InfoCalculateur choisirCalculateur() throws NotEnoughtResourceException {
         LOGGER.info("CHOISIR le calculateur");
         InfoCalculateur choosenCalc = null;
