@@ -252,6 +252,7 @@ public class Repartiteur {
     }
 
     public Repartiteur getRepartiteurInstance() {
+        LOGGER.info("getRepartiteurInstance");
         return this;
     }
 

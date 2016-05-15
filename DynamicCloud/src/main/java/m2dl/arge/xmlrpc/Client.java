@@ -29,7 +29,7 @@ public class Client {
 	private static String port = null;
 	private static Boolean argOK = false;
 	private static PrintWriter writer;
-	private static XmlRpcClient client;
+	private static CustomXmlRpcClient client;
 
 	public static void main(String[] args) throws Exception {
 		parseArgs(args);
@@ -44,7 +44,7 @@ public class Client {
 			config.setConnectionTimeout(60 * 1000);
 			config.setReplyTimeout(60 * 1000);
 
-			client = new XmlRpcClient();
+			client = new CustomXmlRpcClient();
 
 			// use Commons HttpClient as transport
 			client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));

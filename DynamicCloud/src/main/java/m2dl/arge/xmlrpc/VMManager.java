@@ -23,7 +23,7 @@ public class VMManager {
     private static Logger LOGGER = Logger.getLogger("VMManager");
     private static VMManager instance;
     private static PrintWriter writer;
-    private static Repartiteur repartiteur;
+    private static Object repartiteur;
     private static int nouveauPort = 2012;
     private static List<InfoCalculateur> calculateurs;
     private String derniereTraceDeProcess = "";
@@ -34,18 +34,20 @@ public class VMManager {
     public static void main(String[] args) throws MissingImageException, FileNotFoundException,
             UnsupportedEncodingException, MalformedURLException, XmlRpcException {
         System.out.println("Bonjour ?");
-        if (args.length != 2) {
+        if (args.length == 2) {
+            args[0] = (args[0].equals("localhost")) ? "127.0.0.1" : args[0];
+            calculateurs = new ArrayList<>();
 
             /************** CONNEXION AU REPARTITEUR **************/
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             // config.setServerURL(new URL("http://127.0.0.1:8080/xmlrpc"));
-            args[0] = (args[0].equals("localhost")) ? "127.0.0.1" : args[0];
+            LOGGER.info("http://" + args[0] + ":" + args[1] + "/xmlrpc");
             config.setServerURL(new URL("http://" + args[0] + ":" + args[1] + "/xmlrpc"));
             config.setEnabledForExtensions(true);
             config.setConnectionTimeout(60 * 1000);
             config.setReplyTimeout(60 * 1000);
 
-            repartiteurClient = new XmlRpcClient();
+            repartiteurClient = new CustomXmlRpcClient();
 
             // use Commons HttpClient as transport
             repartiteurClient.setTransportFactory(new XmlRpcCommonsTransportFactory(repartiteurClient));
@@ -54,15 +56,18 @@ public class VMManager {
 
 
             Object[] params = new Object[]{};
-            repartiteur = (Repartiteur) repartiteurClient.execute("Repartiteur.getRepartiteurInstance", params);
-            if (repartiteur != null) {
                 System.out.println("LeVMManager est à l'écoute du répartiteur.");
-            }
 
             writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
-            calculateurs = (List<InfoCalculateur>) repartiteurClient.execute("Repartiteur" +
+            Object[] calculateursResponse = (Object[]) repartiteurClient.execute("Repartiteur" +
                     ".getCalculateursLoadBalancing", params);
+            List<InfoCalculateur> az = new ArrayList<>();
+            for(Object calcObject : calculateursResponse)
             // Création d'un premier calculateur.
+            {
+                InfoCalculateur infoCalculateur = (InfoCalculateur) calcObject;
+                calculateurs.add(infoCalculateur);
+            }
             System.out.println("Création du premier calulateur.");
             creerCalculateur("127.0.0.1", nouveauPort);
 
