@@ -34,8 +34,8 @@ public class Calculateur {
         } catch (SigarException se) {
             se.printStackTrace();
         }
-        writer.println("Requête getCpuCharge : " + (cpuperc.getCombined() * 100.D));
-        return cpuperc.getCombined() * 100.D;
+        writer.print((cpuperc.getCombined() * 100) + "\t");
+        return cpuperc.getCombined() * 100;
     }
 
     public int subtract(int i1, int i2) {
@@ -43,7 +43,7 @@ public class Calculateur {
     }
 
     public static void main(String[] args) throws IOException, XmlRpcException {
-        writer = new PrintWriter(new PrintWriter("logCalculateur.txt", "UTF-8"), true);
+        writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
 
         if (args[0] != null) {
 
@@ -84,10 +84,45 @@ public class Calculateur {
                 webServer.start();
                 writer.println("Le Worker Node web a demarre ...");
                 System.out.println("Le Worker Node web a demarre ...");
+
+
+                Mem mem = null;
+                CpuPerc cpuperc = null;
+                FileSystemUsage filesystemusage = null;
+                try {
+                    sigar = new Sigar();
+                    mem = sigar.getMem();
+                    cpuperc = sigar.getCpuPerc();
+                    FileSystem[] res = Calculateur.sigar.getFileSystemList();
+                    for (int i = 0; i < res.length; i++) {
+                        writer.println(res[i].getDirName());
+                        System.out.println(res[i].getDirName());
+                    }
+//            filesystemusage = sigar.getFileSystemUsage("C:");
+                } catch (SigarException se) {
+                    se.printStackTrace();
+                }
+
+
+                System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
+                writer.println(mem.getUsedPercent() + "\t");
+                writer.println((cpuperc.getCombined() * 100) + "\t");
+                String name = ManagementFactory.getRuntimeMXBean().getName();
+                System.out.println(sigar.getProcCpu(Long.parseLong(name.split("@")[0])).getPercent());
+//        writer.println(filesystemusage.getUsePercent() + p"\n");
+
+
+//				} catch (BindException e) {
+//					String[] argsTemp = new String[1];
+//					argsTemp[0] = (Integer.parseInt(args[0]) + 1) + "" ;
+//					Calculateur.main(argsTemp);
+//				}
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
+            } catch (SigarException e) {
+                e.printStackTrace();
             }
         }
     }
