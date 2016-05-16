@@ -112,27 +112,27 @@ public class Repartiteur {
         try {
             res = transmettreLaRequete(id, i1);
         } catch (XmlRpcException e) {
-            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+            LOGGER.info("                                                       \u001B[31m" + "ERREUR : " + e
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
         } catch (CalculatorsManagementException e) {
-            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+            LOGGER.info("                                                       \u001B[31m" + "ERREUR : " + e
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
         } catch (MissingImageException e) {
-            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+            LOGGER.info("                                                       \u001B[31m" + "ERREUR : " + e
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
         } catch (NotEnoughtResourceException e) {
-            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+            LOGGER.info("                                                       \u001B[31m" + "ERREUR : " + e
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
         }
-        LOGGER.info("                                                       \u001B[32m" + "resultat : " + res +
+        LOGGER.info("                                                       \u001B[31m" + "resultat : " + res +
                 "\u001B[0m");
         return "/\\/\\/\\/\\/\\/\\/     La requête " + id + " a pour réponse (peu importe la valeur, à priori " +
                 "toujour 2012) " + res;
@@ -177,7 +177,7 @@ public class Repartiteur {
                         + "_\u001B[0m");
             } catch (XmlRpcException e) {
                 e.printStackTrace();
-                LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                LOGGER.info("                                                       \u001B[31m" + "ERREUR : " + e
                         .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                         "\u001B[0m \n");
                 throw e;
@@ -194,7 +194,7 @@ public class Repartiteur {
             }
         }
         if (result == null) {
-            LOGGER.info("                                                       \u001B[32m" + "ERREUR RESULT == NULL:" +
+            LOGGER.info("                                                       \u001B[31m" + "ERREUR RESULT == NULL:" +
                     " " +
                     "\u001B[0m \n");
             throw new CalculatorsManagementException("Mauvaise gestion des calculateurs");
@@ -207,23 +207,15 @@ public class Repartiteur {
                 "\u001B[0m");
         InfoCalculateur choosenCalc = null;
 
-        System.out.println("taille calc : " + calculateursLoadBalancing.size());
-        writer.println("taille calc : " + calculateursLoadBalancing.size());
+        System.out.println("Nombre de calculateurs recensés : " + calculateursLoadBalancing.size());
+        writer.println("Nombre de calculateurs recensés : " + calculateursLoadBalancing.size());
         // DEBUG
+        LOGGER.info("/****************** Liste des calculateurs : ******************/");
         for (InfoCalculateur calc :
                 calculateursLoadBalancing) {
-            System.out.println(calc.getAdresse());
-            writer.println(calc.getAdresse());
-            System.out.println(calc.getPort());
-            writer.println(calc.getPort());
-            System.out.println(calc.getCharge_courante());
-            writer.println(calc.getCharge_courante());
-            System.out.println(calc.getCharge_max());
-            writer.println(calc.getCharge_max());
-            System.out.println(calc.getState());
-            writer.println(calc.getState());
+            System.out.println(calc.toString());
+            writer.println(calc.toString());
         }
-        //
 
         for (int i = 0; i < calculateursLoadBalancing.size(); i++) {
             InfoCalculateur infoCalculateur = calculateursLoadBalancing.get((calcIndexLoadBalance + i) %
@@ -234,15 +226,15 @@ public class Repartiteur {
             }
         }
         if (choosenCalc == null) {
-            LOGGER.severe("                                                 !!!!!!!!!!!!!!!!!!!! " +
+            LOGGER.severe("\u001B[33m                                        !!!!!!!!!!!!!!!!!!!! " +
                     "ALEEEEEEEEEEEEEEEERTE" +
-                    " : PAS DE CALCULATEUR CHOISIT !!!!!!!!!!!!!!!!!!!!");
+                    " : PAS DE CALCULATEUR CHOISIT !!!!!!!!!!!!!!!!!!!!\u001B[0m");
             // Le Repartiteur est bête, si pas assez de ressource, ce n'est pas à lui de déclencher la création d'un
             // calculateur, même via le VMManager
             throw new NotEnoughtResourceException("Tout les calculateurs sont saturés");
         }
-        LOGGER.info("//////////////////////////////////////// LE CALCULATEUR A ETE CHOISIT " +
-                "////////////////////////////////////////");
+        LOGGER.info("\u001B[32m//////////////////////////////////////// LE CALCULATEUR A ETE CHOISIT " +
+                "////////////////////////////////////////\u001B[0m");
         return choosenCalc;
     }
 
