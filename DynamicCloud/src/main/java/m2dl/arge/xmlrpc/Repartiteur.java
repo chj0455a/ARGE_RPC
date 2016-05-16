@@ -257,8 +257,27 @@ public class Repartiteur {
         return this;
     }
 
-    public boolean addCalculateur(InfoCalculateur infoCalculateur) {
-        LOGGER.info("Recetion d'une requête d'ajout de calculalteur : " + infoCalculateur.toString());
+    public boolean addCalculateur(double charge, String adresse, int port, String id, CalcState etat) {
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        try {
+//            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
+            config.setServerURL(new URL("http://" + adresse + ":"+port+"/calculateur"));
+            LOGGER.info("Nouveau endpoint de calculateur : " + "http://" + adresse + ":"+port+"/calculateur");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        config.setEnabledForExtensions(true);
+        config.setConnectionTimeout(60 * 1000);
+        config.setReplyTimeout(60 * 1000);
+
+        CustomXmlRpcClient client = new CustomXmlRpcClient();
+
+        // use Commons HttpClient as transport
+        client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
+        // set configuration
+        client.setConfig(config);
+        InfoCalculateur infoCalculateur = new InfoCalculateur(client, charge, 300, port, adresse, id, etat);
+        LOGGER.info("Reception d'une requête d'ajout de calculalteur : " + infoCalculateur.toString());
         this.calculateursLoadBalancing.add(infoCalculateur);
         return true;
     }

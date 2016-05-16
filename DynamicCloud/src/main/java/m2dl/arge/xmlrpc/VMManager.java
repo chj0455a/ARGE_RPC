@@ -217,7 +217,10 @@ public class VMManager {
 
         LOGGER.info("Le nouveau calculateur vaut : " + nouveau_calc.toString());
 
-        Object[] params = new Object[]{nouveau_calc};
+        // Tant pis, on peut pas transmettre l'objet, on transmet les param et on réétablira une même connexion côté
+        // répartiteur
+        Object[] params = new Object[]{nouveau_calc.getCharge_courante(), nouveau_calc.getAdresse(), nouveau_calc
+                .getPort(), nouveau_calc.getId(), nouveau_calc.getState()};
 
         LOGGER.info("Transmission du calculateur au Repartiteur");
         try {
