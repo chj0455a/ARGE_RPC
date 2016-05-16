@@ -136,8 +136,8 @@ public class Repartiteur {
                 calculateursLoadBalancing.get(calcIndexLoadBalance).toString() + " RES : " + res;
     }
 
-    public synchronized int transmettreLaRequete(int id, int i) throws XmlRpcException, CalculatorsManagementException,
-            MissingImageException, NotEnoughtResourceException {
+    public synchronized int transmettreLaRequete(int id, int i) throws NotEnoughtResourceException, XmlRpcException,
+            CalculatorsManagementException, MissingImageException {
         LOGGER.info("                                                       \u001B[33m" + "TransmettreLaRequete(" + id
                 + ", " + i + ")" +
                 "\u001B[0m");
@@ -150,7 +150,8 @@ public class Repartiteur {
             LOGGER.info("150                                                                          Selection du " +
                     "calculateur");
             InfoCalculateur calculateur = choisirCalculateur();
-            LOGGER.info("153 \u001B[31m                                                                         _" + calculateur
+            LOGGER.info("153 \u001B[32m                                                                         _" +
+                    calculateur
                     .toString()
                     + "_\u001B[0m");
             if (this.mode.equals("local")) {
@@ -165,10 +166,20 @@ public class Repartiteur {
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
             writer.println
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
-            result = (Integer) calculateur.getClient().execute("Calculateur.requete", params);
-            LOGGER.info("169 \u001B[31m                                                                         " +
-                    "RESULTAT_" + result
-                    + "_\u001B[0m");
+
+
+            try {
+                result = (Integer) calculateur.getClient().execute("Calculateur.requete", params);
+                LOGGER.info("169 \u001B[32m                                                                         " +
+                        "RESULTAT_" + result
+                        + "_\u001B[0m");
+            } catch (XmlRpcException e) {
+                e.printStackTrace();
+                LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                        .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
+                        "\u001B[0m \n");
+                throw e;
+            }
 
 
             calcIndexLoadBalance = (calcIndexLoadBalance + 1) % calculateursLoadBalancing.size();
