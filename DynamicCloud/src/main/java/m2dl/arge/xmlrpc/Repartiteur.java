@@ -111,11 +111,18 @@ public class Repartiteur {
         try {
             res = transmettreLaRequete(id, i1);
         } catch (XmlRpcException e) {
+            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                    .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
+                    "\u001B[0m \n");
             e.printStackTrace();
         } catch (CalculatorsManagementException e) {
+            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                    .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
+                    "\u001B[0m \n");
             e.printStackTrace();
         }
-
+        LOGGER.info("                                                       \u001B[32m" + "resultat : " + res +
+                "\u001B[0m");
         return "/\\/\\/\\/\\/\\/\\/     ID     \\/\\/\\/\\/\\/\\" + i1 + "Calc courant : " +
                 calculateursLoadBalancing.get(calcIndexLoadBalance).toString() + " RES : " + res;
     }
@@ -127,6 +134,9 @@ public class Repartiteur {
                 "\u001B[0m");
         // Choisir le calculateur
         Integer result = null;
+
+        LOGGER.info("CONDITION : " + (calcIndexLoadBalance <= calculateursLoadBalancing.size()));
+
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
             LOGGER.info("                                                                          Selection du " +
                     "calculateur");
@@ -158,6 +168,9 @@ public class Repartiteur {
             }
         }
         if (result == null) {
+            LOGGER.info("                                                       \u001B[32m" + "ERREUR RESULT == NULL:" +
+                    " " +
+                    "\u001B[0m \n");
             throw new CalculatorsManagementException("Mauvaise gestion des calculateurs");
         }
         return result;
