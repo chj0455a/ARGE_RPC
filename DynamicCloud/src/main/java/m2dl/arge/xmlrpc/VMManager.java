@@ -56,7 +56,7 @@ public class VMManager {
 
 
             Object[] params = new Object[]{};
-                System.out.println("LeVMManager est à l'écoute du répartiteur.");
+            System.out.println("LeVMManager est à l'écoute du répartiteur.");
 
             writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
             Object[] calculateursResponse = (Object[]) repartiteurClient.execute("Repartiteur" +
@@ -69,7 +69,7 @@ public class VMManager {
                 calculateurs.add(infoCalculateur);
             }
             System.out.println("Création du premier calulateur.");
-            creerCalculateur("unused", 0);
+            creerCalculateur("127.0.0.1", nouveauPort);
 
 
             // La première VM est créée. Maintenant, on va faire tourner le VMManager en continu pour surveiller
@@ -86,11 +86,11 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
-            LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
+                LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
-                LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
+                    LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
                     double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
                     LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
                     cpuForAllVM += cpu;
@@ -201,7 +201,7 @@ public class VMManager {
         try {
 //            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
             config.setServerURL(new URL("http://" + adresse + ":2012/calculateur"));
-            LOGGER.info("--> Nouveau endpoint de calculateur : " + "http://" + adresse + ":2012/calculateur");
+            LOGGER.info("Nouveau endpoint de calculateur : " + "http://" + adresse + ":2012/calculateur");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
