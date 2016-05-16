@@ -56,7 +56,7 @@ public class VMManager {
 
 
             Object[] params = new Object[]{};
-                System.out.println("LeVMManager est à l'écoute du répartiteur.");
+            System.out.println("LeVMManager est à l'écoute du répartiteur.");
 
             writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
             Object[] calculateursResponse = (Object[]) repartiteurClient.execute("Repartiteur" +
@@ -86,23 +86,14 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
-            LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
+                LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
-                LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
-                    double cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    double cpu2 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    double cpuMoy = (cpu1 + cpu2) / 2.;
-                    LOGGER.info("-----------------------------Sa CPU : " + cpuMoy + "-----------------------------");
-                    cpuForAllVM += cpuMoy;
-                    Object[] params2 = {new String(calc.getAdresse()), new Integer(calc.getPort()), new Double(cpuMoy)};
-                    calc.getClient().executeAsync("Repartiteur.setCharge", params, null);
+                    LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
+                    double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
+                    cpuForAllVM += cpu;
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
                         " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
