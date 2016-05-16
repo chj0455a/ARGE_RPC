@@ -160,7 +160,8 @@ public class Repartiteur {
     }
 
     public InfoCalculateur choisirCalculateur() throws NotEnoughtResourceException {
-        LOGGER.info("CHOISIR le calculateur");
+        LOGGER.info("                                                       \u001B[33m" + "choisirCalculateur()" +
+                "\u001B[0m");
         InfoCalculateur choosenCalc = null;
 
         System.out.println("taille calc : " + calculateursLoadBalancing.size());
@@ -251,20 +252,28 @@ public class Repartiteur {
     }
 
     public Repartiteur getRepartiteurInstance() {
+        LOGGER.info("                                                       \u001B[33m" + "getRepartiteurInstance()" +
+                "\u001B[0m");
         LOGGER.info("getRepartiteurInstance");
         return this;
     }
 
     public boolean addCalculateur(InfoCalculateur infoCalculateur) {
         LOGGER.info("Reception d'une requête d'ajout de calculalteur : " + infoCalculateur.toString());
+        LOGGER.info("                                                       \u001B[33m" + "addCalculateur(" +
+                infoCalculateur.toString() + ")\u001B[0m");
         return this.calculateursLoadBalancing.add(infoCalculateur);
     }
 
     public boolean removeCalculateur(InfoCalculateur infoCalculateur) {
+        LOGGER.info("                                                       \u001B[33m" + "removeCalculateur(" +
+                infoCalculateur.toString() + ")\u001B[0m");
         return this.calculateursLoadBalancing.remove(infoCalculateur);
     }
 
     public boolean setCharge(String adresse, int port, double charge) {
+        LOGGER.info("                                                       \u001B[33m" + "setCharge(" + adresse + "," +
+                " " + port + ", " + charge + ")\u001B[0m");
         for (InfoCalculateur calcInfo :
                 this.calculateursLoadBalancing) {
             if (calcInfo.getAdresse().equals(adresse) && calcInfo.getPort() == port) {
