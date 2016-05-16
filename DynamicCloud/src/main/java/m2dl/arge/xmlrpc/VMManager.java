@@ -86,14 +86,21 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
-                LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
+                LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
                     LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
-                    double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
-                    cpuForAllVM += cpu;
+                    double cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    double cpu2 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    double cpuMoy = (cpu1 + cpu2) / 2.D;
+                    LOGGER.info("-----------------------------Sa CPU : " + cpuMoy + "-----------------------------");
+                    cpuForAllVM += cpuMoy;
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
                         " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
