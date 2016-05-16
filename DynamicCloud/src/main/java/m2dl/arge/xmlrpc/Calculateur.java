@@ -34,8 +34,8 @@ public class Calculateur {
         } catch (SigarException se) {
             se.printStackTrace();
         }
-        writer.print((cpuperc.getCombined() * 100) + "\t");
-        return cpuperc.getCombined() * 100;
+        writer.print((cpuperc.getCombined() * 100.) + "\t");
+        return cpuperc.getCombined() * 100.;
     }
 
     public int subtract(int i1, int i2) {
@@ -43,7 +43,7 @@ public class Calculateur {
     }
 
     public static void main(String[] args) throws IOException, XmlRpcException {
-        writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
+        writer = new PrintWriter(new PrintWriter("logCalculateur.txt", "UTF-8"), true);
 
         if (args[0] != null) {
 

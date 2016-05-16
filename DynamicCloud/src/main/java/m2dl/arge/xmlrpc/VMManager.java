@@ -86,12 +86,13 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
+            LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
-
+                LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
                     double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    LOGGER.info("" + cpu);
+                    LOGGER.info("Sa CPU : " + cpu);
                     cpuForAllVM += cpu;
                 }
                 if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
