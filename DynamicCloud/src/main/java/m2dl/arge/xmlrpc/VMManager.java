@@ -101,10 +101,6 @@ public class VMManager {
                     double cpuMoy = (cpu1 + cpu2) / 2.D;
                     LOGGER.info("-----------------------------Sa CPU : " + cpuMoy + "-----------------------------");
                     cpuForAllVM += cpuMoy;
-                    repartiteurClient.executeAsync("Repartiteur.setCharge", new Object[]{calc.getAdresse(),
-                            new Integer(calc
-                            .getPort()), new Double(calc
-                            .getCharge_courante())}, null);
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
                         " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
