@@ -34,8 +34,8 @@ public class Calculateur {
         } catch (SigarException se) {
             se.printStackTrace();
         }
-        writer.print((cpuperc.getCombined() * 100.) + "\t");
-        return cpuperc.getCombined() * 100.;
+        writer.println("Requête getCpuCharge : " + (cpuperc.getCombined() * 100.D) + " " + cpuperc.format(cpuperc.getCombined()));
+        return cpuperc.getCombined() * 100.D;
     }
 
     public int subtract(int i1, int i2) {
