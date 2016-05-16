@@ -86,6 +86,6 @@ public class InfoCalculateur implements Serializable {
 	@Override
 	public String toString() {
 		return super.toString() + "\n" + " ID: " + this.getId() + " ADRESSE: " + this.adresse + " PORT: " + this.port +
-				"ETAT" + this.state;
+				" ETAT: " + this.state;
 	}
 }

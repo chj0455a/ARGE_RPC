@@ -258,7 +258,7 @@ public class Repartiteur {
     }
 
     public boolean addCalculateur(InfoCalculateur infoCalculateur) {
-        LOGGER.info("Recetion d'une requête d'ajout de calculalteur : " + infoCalculateur.toString());
+        LOGGER.info("Reception d'une requête d'ajout de calculalteur : " + infoCalculateur.toString());
         return this.calculateursLoadBalancing.add(infoCalculateur);
     }
 
