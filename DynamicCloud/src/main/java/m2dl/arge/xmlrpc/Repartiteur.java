@@ -69,7 +69,7 @@ public class Repartiteur {
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
 
-        XmlRpcClient client = new XmlRpcClient();
+        CustomXmlRpcClient client = new CustomXmlRpcClient();
 
         // use Commons HttpClient as transport
         client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
