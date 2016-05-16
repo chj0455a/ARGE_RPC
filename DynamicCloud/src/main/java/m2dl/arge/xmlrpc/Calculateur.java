@@ -17,6 +17,9 @@ public class Calculateur {
     private static PrintWriter writer;
 
     public int add(int i1, int i2) throws InterruptedException {
+        if(this.writer != null) {
+            writer.println("Requete " + i2 + " recue;");
+        }
         int nbDivisibles = 0;
         for (int i = 2; i < i1; i++) {
             if (i1 % i == 0) {
