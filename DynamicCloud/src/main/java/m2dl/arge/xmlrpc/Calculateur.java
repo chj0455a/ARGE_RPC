@@ -43,7 +43,7 @@ public class Calculateur {
     }
 
     public static void main(String[] args) throws IOException, XmlRpcException {
-        writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
+        writer = new PrintWriter(new PrintWriter("logCalculateur2.txt", "UTF-8"), true);
 
         if (args[0] != null) {
 
