@@ -108,6 +108,11 @@ public class VMManager {
                         "= " + calculateurs.size());
                 if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
                     creerCalculateur(null, 0);
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 //        Thread clean = new Thread(){
