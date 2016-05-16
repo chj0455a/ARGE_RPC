@@ -56,7 +56,7 @@ public class VMManager {
 
 
             Object[] params = new Object[]{};
-            System.out.println("LeVMManager est à l'écoute du répartiteur.");
+                System.out.println("LeVMManager est à l'écoute du répartiteur.");
 
             writer = new PrintWriter(new PrintWriter("logVMManagerLog.txt", "UTF-8"), true);
             Object[] calculateursResponse = (Object[]) repartiteurClient.execute("Repartiteur" +
@@ -86,44 +86,20 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
-                LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
+            LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
-
-                    XmlRpcClientConfigImpl configTemp = new XmlRpcClientConfigImpl();
-                    // config.setServerURL(new URL("http://127.0.0.1:8080/xmlrpc"));
-                    LOGGER.info("http://" + calc.getAdresse() + ":" + calc.getPort() + "/xmlrpc");
-                    configTemp.setServerURL(new URL("http://" + calc.getAdresse() + ":" + calc.getPort() + "/xmlrpc"));
-                    configTemp.setEnabledForExtensions(true);
-                    configTemp.setConnectionTimeout(60 * 1000);
-                    configTemp.setReplyTimeout(60 * 1000);
-
-                    CustomXmlRpcClient tempClient = new CustomXmlRpcClient();
-
-                    // use Commons HttpClient as transport
-                    tempClient.setTransportFactory(new XmlRpcCommonsTransportFactory(tempClient));
-                    // set configuration
-                    repartiteurClient.setConfig(configTemp);
-
-
-                    Object[] paramsTemp = new Object[]{};
-
-
-                    LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
-                    double cpu = (double) tempClient.execute("Calculateur.getCPUCharge", new Object[]{});
+                LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
+                    double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
                     LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
                     cpuForAllVM += cpu;
-                    tempClient = null;
-                    configTemp = null;
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
-                        " -> " +  (cpuForAllVM > 80.D * new Double(calculateurs.size()) && calculateurs.size() < 5) + " " +
-                        "car nb " +
+                        " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
                         "calc " +
                         "= " + calculateurs.size());
-
-                if (cpuForAllVM / new Double(calculateurs.size()) > 80.D && calculateurs.size() < 5) {
+                if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
                     creerCalculateur(null, 0);
                 }
             }
