@@ -121,15 +121,15 @@ public class Repartiteur {
     public synchronized int transmettreLaRequete(int id, int i) throws XmlRpcException, CalculatorsManagementException,
             MissingImageException, NotEnoughtResourceException {
         LOGGER.info("Transmission de requ�te.");
-        // TODO : PLUS BESOIN
-//			vMManager.choisirLeCalculateur();
-        // make the a regular call
         // Choisir le calculateur
         Integer result = null;
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
-            LOGGER.info("                                           Selection du calculateur");
+            LOGGER.info("                                                                          Selection du " +
+                    "calculateur");
             InfoCalculateur calculateur = choisirCalculateur();
-
+            LOGGER.info("                                                                          _" + calculateur
+                    .toString()
+                    + "_");
             if (this.mode.equals("local")) {
                 calculateur.setCharge_courante(calculateur.getCharge_courante() + 1.);
             }
@@ -190,6 +190,9 @@ public class Repartiteur {
             }
         }
         if (choosenCalc == null) {
+            LOGGER.severe("                                                 !!!!!!!!!!!!!!!!!!!! " +
+                    "ALEEEEEEEEEEEEEEEERTE" +
+                    " : PAS DE CALCULATEUR CHOISIT !!!!!!!!!!!!!!!!!!!!");
             // Le Repartiteur est bête, si pas assez de ressource, ce n'est pas à lui de déclencher la création d'un
             // calculateur, même via le VMManager
             throw new NotEnoughtResourceException("Tout les calculateurs sont saturés");
