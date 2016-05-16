@@ -204,13 +204,13 @@ public class VMManager {
             ArrayList<String> networks = new ArrayList<>();
             networks.add("c1445469-4640-4c5a-ad86-9c0cb6650cca");
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            ServerCreate sc = Builders.server().name("z_WN_" + nombreVM + "_" + df.format(new Date())).networks
+            ServerCreate sc = Builders.server().name("JC_WN_" + nombreVM + "_" + df.format(new Date())).networks
                     (networks).flavor("2").keypairName("jckey").image(imageForNewVM.getId()).build();
 
             server = os.compute().servers().boot(sc);
         } else {
-            LOGGER.severe("L'image trueJCWNimg n'a pas été trouvée");
-            throw new MissingImageException("L'image trueJCWNimg n'a pas été trouvée");
+            LOGGER.severe("L'image jcWNimg n'a pas été trouvée");
+            throw new MissingImageException("L'image jcWNimg n'a pas été trouvée");
         }
 
         boolean wait = true;
