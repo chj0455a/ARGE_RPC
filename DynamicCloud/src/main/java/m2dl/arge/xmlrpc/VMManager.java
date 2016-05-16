@@ -96,7 +96,8 @@ public class VMManager {
                     cpuForAllVM += cpu;
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
-                        " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
+                        " -> " +  (cpuForAllVM > 80.D * new Double(calculateurs.size()) && calculateurs.size() < 5) + " " +
+                        "car nb " +
                         "calc " +
                         "= " + calculateurs.size());
                 if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
