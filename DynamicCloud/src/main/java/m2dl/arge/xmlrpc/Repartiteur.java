@@ -134,8 +134,8 @@ public class Repartiteur {
         }
         LOGGER.info("                                                       \u001B[32m" + "resultat : " + res +
                 "\u001B[0m");
-        return "/\\/\\/\\/\\/\\/\\/     ID     \\/\\/\\/\\/\\/\\" + i1 + "Calc courant : " +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).toString() + " RES : " + res;
+        return "/\\/\\/\\/\\/\\/\\/     La requête " + id + " a pour réponse (peu importe la valeur, à priori " +
+                "toujour 2012) " + res;
     }
 
     public synchronized int transmettreLaRequete(int id, int i) throws NotEnoughtResourceException, XmlRpcException,
