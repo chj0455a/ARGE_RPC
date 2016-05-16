@@ -9,14 +9,14 @@ import java.io.Serializable;
 public class InfoCalculateur implements Serializable {
 
 	private String adresse;
-	private XmlRpcClient client;
+	private CustomXmlRpcClient client;
 	private double charge_courante;
 	private int charge_max;
 	private int port;
     private CalcState state;
     private String id;
 
-    public InfoCalculateur(XmlRpcClient client, double charge_courante, int charge_max, int port, String adresse, String id, CalcState etat) {
+    public InfoCalculateur(CustomXmlRpcClient client, double charge_courante, int charge_max, int port, String adresse, String id, CalcState etat) {
 		super();
 		this.client = client;
 		this.charge_courante = charge_courante;
@@ -27,11 +27,11 @@ public class InfoCalculateur implements Serializable {
         this.id = id;
 	}
 
-	public XmlRpcClient getClient() {
+	public CustomXmlRpcClient getClient() {
 		return client;
 	}
 
-	public void setClient(XmlRpcClient client) {
+	public void setClient(CustomXmlRpcClient client) {
 		this.client = client;
 	}
 
@@ -82,4 +82,10 @@ public class InfoCalculateur implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+	@Override
+	public String toString() {
+		return super.toString() + "\n" + "ID: " + this.getId() + " ADRESSE: " + this.adresse + "PORT: " + this.port +
+				"ETAT" + this.state;
+	}
 }

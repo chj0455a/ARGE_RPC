@@ -141,6 +141,7 @@ public class VMManager {
                 imagesList) {
             if (image.getName().equals("jcWNimg")) {
                 imageForNewVM = image;
+                LOGGER.info(image.getName());
             }
         }
 
@@ -173,7 +174,7 @@ public class VMManager {
                 }
             }
         }
-
+        LOGGER.info("Server has boot and is now ACTIVE");
         server = os.compute().servers().get(server.getId());
         for (List<? extends Address> adresse :
                 server.getAddresses().getAddresses().values()) {
@@ -195,6 +196,7 @@ public class VMManager {
         try {
 //            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
             config.setServerURL(new URL("http://" + adresse + ":2012/calculateur"));
+            LOGGER.info("Nouveau endpoint de calculateur : " + "http://" + adresse + ":2012/calculateur");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -202,7 +204,7 @@ public class VMManager {
         config.setConnectionTimeout(60 * 1000);
         config.setReplyTimeout(60 * 1000);
 
-        XmlRpcClient client = new XmlRpcClient();
+        CustomXmlRpcClient client = new CustomXmlRpcClient();
 
         // use Commons HttpClient as transport
         client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
@@ -213,8 +215,18 @@ public class VMManager {
 //        if (calculateurCourant == null) {
 //        }
 
+        LOGGER.info("Le nouveau calculateur vaut : " + nouveau_calc.toString());
+
         Object[] params = new Object[]{nouveau_calc};
-        client.execute("Repartiteur.addCalculateur", params);
+
+        LOGGER.info("Transmission du calculateur au Repartiteur");
+        try {
+            client.execute("Repartiteur.addCalculateur", params);
+        } catch (XmlRpcException e) {
+            LOGGER.info("ECHEC :" + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
         calculateurs.add(nouveau_calc);
         System.out.println(calculateurs.size() + " calculateur(s)");
         return nouveau_calc;
