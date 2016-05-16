@@ -218,6 +218,7 @@ public class Repartiteur {
     }
 
     public int linkRequest(String requete, String adresseCalc, String portCalc) throws MalformedURLException {
+
         System.out.print("Mise � jour ? > ");
         // update_repartiteur pascompris pascompris add 127.0.0.1 2012
         toto = Integer.parseInt(portCalc);

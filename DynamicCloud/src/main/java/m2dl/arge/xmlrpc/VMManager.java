@@ -139,7 +139,7 @@ public class VMManager {
         Image imageForNewVM = null;
         for (Image image :
                 imagesList) {
-            if (image.getName().equals("trueJCWNimg")) {
+            if (image.getName().equals("jcWNimg")) {
                 imageForNewVM = image;
             }
         }
