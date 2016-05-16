@@ -69,7 +69,7 @@ public class VMManager {
                 calculateurs.add(infoCalculateur);
             }
             System.out.println("Création du premier calulateur.");
-            creerCalculateur("127.0.0.1", nouveauPort);
+            creerCalculateur("unused", 0);
 
 
             // La première VM est créée. Maintenant, on va faire tourner le VMManager en continu pour surveiller
@@ -201,7 +201,7 @@ public class VMManager {
         try {
 //            config.setServerURL(new URL("http://" + machine + ":" + port + "/calculateur"));
             config.setServerURL(new URL("http://" + adresse + ":2012/calculateur"));
-            LOGGER.info("Nouveau endpoint de calculateur : " + "http://" + adresse + ":2012/calculateur");
+            LOGGER.info("--> Nouveau endpoint de calculateur : " + "http://" + adresse + ":2012/calculateur");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
