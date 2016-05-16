@@ -83,13 +83,7 @@ public class VMManager {
                 for (InfoCalculateur calc :
                         calculateurs) {
                     LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
-                    double cpu1 = 0;
-                    try {
-                        cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    } catch (XmlRpcException e) {
-                        e.printStackTrace();
-                        retry(calc, "Calculateur.getCPUCharge");
-                    }
+                    double cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
                     try {
                         Thread.sleep(250);
                     } catch (InterruptedException e) {
@@ -181,22 +175,6 @@ public class VMManager {
         }
     }
 
-    private static double retry(InfoCalculateur calc, String method) {
-        boolean succeed = false;
-        double cpu = 0;
-        while (!succeed) {
-            try {
-                cpu = (double) calc.getClient().execute(method, new Object[]{});
-                succeed = true;
-                LOGGER.info("Succes du retry.");
-            } catch (XmlRpcException e) {
-                LOGGER.severe("Echec du retry.");
-                e.printStackTrace();
-            }
-        }
-        return cpu;
-    }
-
     private synchronized void deleteVM(InfoCalculateur calc) {
         OSClient os = this.cloudmipConnection();
         this.calculateurs.remove(calc.getAdresse());
@@ -214,7 +192,7 @@ public class VMManager {
         Image imageForNewVM = null;
         for (Image image :
                 imagesList) {
-            if (image.getName().equals("jcWNimg2")) {
+            if (image.getName().equals("jcWNimg")) {
                 imageForNewVM = image;
                 LOGGER.info(image.getName());
             }
@@ -232,7 +210,7 @@ public class VMManager {
             server = os.compute().servers().boot(sc);
         } else {
             LOGGER.severe("L'image trueJCWNimg n'a pas été trouvée");
-            throw new MissingImageException("L'image jcWNimg n'a pas été trouvée");
+            throw new MissingImageException("L'image trueJCWNimg n'a pas été trouvée");
         }
 
         boolean wait = true;

@@ -17,9 +17,6 @@ public class Calculateur {
     private static PrintWriter writer;
 
     public int add(int i1, int i2) throws InterruptedException {
-        if(this.writer != null) {
-            writer.println("Requete " + i2 + " recue;");
-        }
         int nbDivisibles = 0;
         for (int i = 2; i < i1; i++) {
             if (i1 % i == 0) {
@@ -47,7 +44,7 @@ public class Calculateur {
 
     public static void main(String[] args) throws IOException, XmlRpcException {
         writer = new PrintWriter(new PrintWriter("logCalculateur2.txt", "UTF-8"), true);
-        sigar = new Sigar();
+
         if (args[0] != null) {
 
             try {
@@ -89,12 +86,43 @@ public class Calculateur {
                 System.out.println("Le Worker Node web a demarre ...");
 
 
+                Mem mem = null;
+                CpuPerc cpuperc = null;
+                FileSystemUsage filesystemusage = null;
+                try {
+                    sigar = new Sigar();
+                    mem = sigar.getMem();
+                    cpuperc = sigar.getCpuPerc();
+                    FileSystem[] res = Calculateur.sigar.getFileSystemList();
+                    for (int i = 0; i < res.length; i++) {
+                        writer.println(res[i].getDirName());
+                        System.out.println(res[i].getDirName());
+                    }
+//            filesystemusage = sigar.getFileSystemUsage("C:");
+                } catch (SigarException se) {
+                    se.printStackTrace();
+                }
 
 
+                System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
+                writer.println(mem.getUsedPercent() + "\t");
+                writer.println((cpuperc.getCombined() * 100) + "\t");
+                String name = ManagementFactory.getRuntimeMXBean().getName();
+                System.out.println(sigar.getProcCpu(Long.parseLong(name.split("@")[0])).getPercent());
+//        writer.println(filesystemusage.getUsePercent() + p"\n");
+
+
+//				} catch (BindException e) {
+//					String[] argsTemp = new String[1];
+//					argsTemp[0] = (Integer.parseInt(args[0]) + 1) + "" ;
+//					Calculateur.main(argsTemp);
+//				}
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
+            } catch (SigarException e) {
+                e.printStackTrace();
             }
         }
     }
