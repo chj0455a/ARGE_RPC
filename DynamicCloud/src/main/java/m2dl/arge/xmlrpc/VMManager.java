@@ -92,9 +92,13 @@ public class VMManager {
                         calculateurs) {
                 LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
                     double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    LOGGER.info("Sa CPU : " + cpu);
+                    LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
                     cpuForAllVM += cpu;
                 }
+                LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
+                        " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
+                        "calc " +
+                        "= " + calculateurs.size());
                 if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
                     creerCalculateur(null, 0);
                 }
