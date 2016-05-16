@@ -71,7 +71,7 @@ public class Client {
                                 try {
                                     Object[] params = new Object[]{new Integer(idRequete), new Integer(10000)};
                                     idRequete ++;
-                                    client.executeAsync("Calculateur.requete", params, new AsyncCallback() {
+                                    client.executeAsync("Calculateur.add", params, new AsyncCallback() {
 
                                         public void handleResult(XmlRpcRequest arg0, Object arg1) {
                                             System.out.println("File is created!");

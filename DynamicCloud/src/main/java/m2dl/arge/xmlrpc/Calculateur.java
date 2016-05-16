@@ -7,10 +7,8 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 import org.hyperic.sigar.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 
 public class Calculateur {
@@ -18,8 +16,7 @@ public class Calculateur {
     private static Sigar sigar;
     private static PrintWriter writer;
 
-    public int requete(int id, int i1) throws InterruptedException {
-        writer.println("REQUETE " + id + " RECUE.");
+    public int add(int i1, int i2) throws InterruptedException {
         int nbDivisibles = 0;
         for (int i = 2; i < i1; i++) {
             if (i1 % i == 0) {
@@ -31,19 +28,6 @@ public class Calculateur {
     }
 
     public double getCPUCharge() {
-        writer.println("getCPUCharge RECUE.");
-        if(this.sigar == null) {
-            sigar = new Sigar();
-        }
-        if (this.writer == null) {
-            try {
-                this.writer = new PrintWriter(new PrintWriter("logCalculateur2.txt", "UTF-8"), true);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
         CpuPerc cpuperc = null;
         try {
             cpuperc = sigar.getCpuPerc();
@@ -52,6 +36,10 @@ public class Calculateur {
         }
         writer.print((cpuperc.getCombined() * 100) + "\t");
         return cpuperc.getCombined() * 100;
+    }
+
+    public int subtract(int i1, int i2) {
+        return i1 - i2;
     }
 
     public static void main(String[] args) throws IOException, XmlRpcException {
@@ -98,10 +86,43 @@ public class Calculateur {
                 System.out.println("Le Worker Node web a demarre ...");
 
 
+                Mem mem = null;
+                CpuPerc cpuperc = null;
+                FileSystemUsage filesystemusage = null;
+                try {
+                    sigar = new Sigar();
+                    mem = sigar.getMem();
+                    cpuperc = sigar.getCpuPerc();
+                    FileSystem[] res = Calculateur.sigar.getFileSystemList();
+                    for (int i = 0; i < res.length; i++) {
+                        writer.println(res[i].getDirName());
+                        System.out.println(res[i].getDirName());
+                    }
+//            filesystemusage = sigar.getFileSystemUsage("C:");
+                } catch (SigarException se) {
+                    se.printStackTrace();
+                }
+
+
+                System.setProperty("java.library.path", "/home/ubuntu/hyperic-sigar-1.6.4/sigar-bin/lib/libsigar-amd64-linux.so");
+                writer.println(mem.getUsedPercent() + "\t");
+                writer.println((cpuperc.getCombined() * 100) + "\t");
+                String name = ManagementFactory.getRuntimeMXBean().getName();
+                System.out.println(sigar.getProcCpu(Long.parseLong(name.split("@")[0])).getPercent());
+//        writer.println(filesystemusage.getUsePercent() + p"\n");
+
+
+//				} catch (BindException e) {
+//					String[] argsTemp = new String[1];
+//					argsTemp[0] = (Integer.parseInt(args[0]) + 1) + "" ;
+//					Calculateur.main(argsTemp);
+//				}
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 writer.println("Mauvais argument, usage : \n./Calculateur <nombre entier>");
 
+            } catch (SigarException e) {
+                e.printStackTrace();
             }
         }
     }

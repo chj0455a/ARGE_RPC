@@ -102,7 +102,7 @@ public class Repartiteur {
 
 
     //	public int add(int i1, int i2) throws CalculatorsManagementException {
-    public String requete(int id, int i1) throws CalculatorsManagementException, MissingImageException,
+    public String add(int id, int i1) throws CalculatorsManagementException, MissingImageException,
             NotEnoughtResourceException {
         LOGGER.info("*--**--**--**--* REQUETE __" + id + "__ RECUE");
         int res = 0;
@@ -121,6 +121,9 @@ public class Repartiteur {
     public synchronized int transmettreLaRequete(int id, int i) throws XmlRpcException, CalculatorsManagementException,
             MissingImageException, NotEnoughtResourceException {
         LOGGER.info("Transmission de requ�te.");
+        // TODO : PLUS BESOIN
+//			vMManager.choisirLeCalculateur();
+        // make the a regular call
         // Choisir le calculateur
         Integer result = null;
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
@@ -142,7 +145,7 @@ public class Repartiteur {
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
             writer.println
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
-            result = (Integer) calculateur.getClient().execute("Calculateur.requete", params);
+            result = (Integer) calculateur.getClient().execute("Calculateur.requette", params);
 
             calcIndexLoadBalance = (calcIndexLoadBalance + 1) % calculateursLoadBalancing.size();
 
