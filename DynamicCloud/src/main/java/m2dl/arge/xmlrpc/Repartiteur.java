@@ -147,12 +147,12 @@ public class Repartiteur {
         LOGGER.info("CONDITION : " + (calcIndexLoadBalance <= calculateursLoadBalancing.size()));
 
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
-            LOGGER.info("                                                                          Selection du " +
+            LOGGER.info("150                                                                          Selection du " +
                     "calculateur");
             InfoCalculateur calculateur = choisirCalculateur();
-            LOGGER.info("                                                                          _" + calculateur
+            LOGGER.info("153 \u001B[31m                                                                         _" + calculateur
                     .toString()
-                    + "_");
+                    + "_\u001B[0m");
             if (this.mode.equals("local")) {
                 calculateur.setCharge_courante(calculateur.getCharge_courante() + 1.);
             }
@@ -166,6 +166,10 @@ public class Repartiteur {
             writer.println
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
             result = (Integer) calculateur.getClient().execute("Calculateur.requete", params);
+            LOGGER.info("169 \u001B[31m                                                                         " +
+                    "RESULTAT_" + result
+                    + "_\u001B[0m");
+
 
             calcIndexLoadBalance = (calcIndexLoadBalance + 1) % calculateursLoadBalancing.size();
 
@@ -224,6 +228,8 @@ public class Repartiteur {
             // calculateur, même via le VMManager
             throw new NotEnoughtResourceException("Tout les calculateurs sont saturés");
         }
+        LOGGER.info("//////////////////////////////////////// LE CALCULATEUR A ETE CHOISIT " +
+                "////////////////////////////////////////");
         return choosenCalc;
     }
 
