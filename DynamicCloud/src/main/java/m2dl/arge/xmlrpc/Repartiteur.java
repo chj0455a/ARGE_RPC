@@ -12,8 +12,6 @@ import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.xmlrpc.XmlRpcException;
 //  import org.apache.xmlrpc.demo.webserver.proxy.impls.AdderImpl;
-import org.apache.xmlrpc.XmlRpcRequest;
-import org.apache.xmlrpc.client.AsyncCallback;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
@@ -171,24 +169,10 @@ public class Repartiteur {
 
 
             try {
-                calculateur.getClient().executeAsync("Calculateur.requete", params, new AsyncCallback() {
-
-                    @Override
-                    public void handleResult(XmlRpcRequest pRequest, Object pResult) {
-                        LOGGER.info("169 \u001B[32m                                                                         " +
-                                "RESULTAT_" + result
-                                + "_\u001B[0m");
-                    }
-
-                    @Override
-                    public void handleError(XmlRpcRequest pRequest, Throwable pError) {
-                        LOGGER.info("153 \u001B[31m                                                                  " +
-                                "       _" +
-                                pError.getMessage() + " \n" + pError.getCause() + " \n" + pError.getStackTrace()
-                                + "_\u001B[0m");
-                    }
-                });
-
+                result = (Integer) calculateur.getClient().execute("Calculateur.requete", params);
+                LOGGER.info("169 \u001B[32m                                                                         " +
+                        "RESULTAT_" + result
+                        + "_\u001B[0m");
             } catch (XmlRpcException e) {
                 e.printStackTrace();
                 LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
