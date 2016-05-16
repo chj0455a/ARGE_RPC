@@ -63,7 +63,7 @@ public class VMManager {
             Object[] calculateursResponse = (Object[]) repartiteurClient.execute("Repartiteur" +
                     ".getCalculateursLoadBalancing", params);
             List<InfoCalculateur> az = new ArrayList<>();
-            for(Object calcObject : calculateursResponse)
+            for (Object calcObject : calculateursResponse)
             // Création d'un premier calculateur.
             {
                 InfoCalculateur infoCalculateur = (InfoCalculateur) calcObject;
@@ -76,15 +76,6 @@ public class VMManager {
             // La première VM est créée. Maintenant, on va faire tourner le VMManager en continu pour surveiller
             // l'activité des calculateurs et en ajouter / supprimer si besoin est
             while (true) {
-                     /* D'abord, la suppression de VM inutiles
-
-                     *  Le fonctionnement actuel est du semi-round robin, pour savoir quand ajouter un VM, on peut
-                     * définir que si l'activité de toutes les VM est supérieur à un certain seuil (pas le max par
-                     * précaution pour perdre le moins de messages possibles), alors on ajoute une VM
-                     *
-                    * Pour la suppression, on pourrait choisir de libérer une VM si la somme totale de CPU libre
-                    * était égale à la CPU d'une VM mais par soucis de simplicité, on libérera les VM au cas par cas
-                    * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
                 LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
@@ -104,7 +95,7 @@ public class VMManager {
                     cpuForAllVM += cpuMoy;
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
-                        " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
+                        " -> " + (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
                         "calc " +
                         "= " + calculateurs.size());
                 if (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) {
@@ -115,7 +106,51 @@ public class VMManager {
                         e.printStackTrace();
                     }
                 }
+
+                /* Ensuite, la suppression de VM inutiles
+
+                     *  Le fonctionnement actuel est du semi-round robin, pour savoir quand ajouter un VM, on peut
+                     * définir que si l'activité de toutes les VM est supérieur à un certain seuil (pas le max par
+                     * précaution pour perdre le moins de messages possibles), alors on ajoute une VM
+                     *
+                    * Pour la suppression, on pourrait choisir de libérer une VM si la somme totale de CPU libre
+                    * était égale à la CPU d'une VM mais par soucis de simplicité, on libérera les VM au cas par cas
+                    * selon leur propre VM*/
+
+                /*for (InfoCalculateur calc :
+                        calculateurs) {
+                    LOGGER.info("*//** Calculateur examiné : " + calc.toString() + " **//*");
+                    double cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    double cpu2 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    double cpuMoy = (cpu1 + cpu2) / 2.D;
+                    LOGGER.info("-----------------------------Sa CPU : " + cpuMoy + "-----------------------------");
+                    if (cpuMoy > 80.) {
+                        // Etiqueter le calculateur comme futurement supprimé
+                        calc.setState(CalcState.WILL_BE_DELETED);
+                        try {
+                            // Attendre un peu que le nombre de requetes diminue et supprimer le calculcateur
+                            Thread.sleep(10000);
+                            try {
+                                boolean result = (boolean) repartiteurClient.execute("Repartiteur.addCalculateur",
+                                        params);
+                            } catch (XmlRpcException e) {
+                                LOGGER.info("ECHEC :" + e.getMessage());
+                                e.printStackTrace();
+                                throw e;
+                            }
+                            calculateurs.remove(calc);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }*/
             }
+
 //        Thread clean = new Thread(){
 //            @Override
 //            public void run() {
