@@ -104,7 +104,9 @@ public class Repartiteur {
     //	public int add(int i1, int i2) throws CalculatorsManagementException {
     public String add(int id, int i1) throws CalculatorsManagementException, MissingImageException,
             NotEnoughtResourceException {
-        LOGGER.info("*--**--**--**--* REQUETE __" + id + "__ RECUE");
+        LOGGER.info("                                                       \u001B[33m" + "*--**--**--**--* REQUETE " +
+                "__" + id + "__ RECUE" +
+                "\u001B[0m");
         int res = 0;
         try {
             res = transmettreLaRequete(id, i1);
@@ -120,7 +122,9 @@ public class Repartiteur {
 
     public synchronized int transmettreLaRequete(int id, int i) throws XmlRpcException, CalculatorsManagementException,
             MissingImageException, NotEnoughtResourceException {
-        LOGGER.info("Transmission de requ�te.");
+        LOGGER.info("                                                       \u001B[33m" + "TransmettreLaRequete(" + id
+                + ", " + i + ")" +
+                "\u001B[0m");
         // Choisir le calculateur
         Integer result = null;
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
