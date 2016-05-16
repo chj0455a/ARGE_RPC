@@ -29,14 +29,15 @@ public class Repartiteur {
     public static List<InfoCalculateur> calculateursLoadBalancing;
     private static PrintWriter writer;
     public static int calcIndexLoadBalance = 0;
-    public static int toto = 0;
+    private static String mode;
 
 
     public static void main(String[] args) throws Exception {
         System.out.println("Repartiteur nouvelle version2");
         writer = new PrintWriter(new PrintWriter("logRepartiteur.txt", "UTF-8"), true);
-        if (args[0] != null) {
+        if (args[0] != null && args[1] != null && (args[1].equals("local") || args[1].equals("cloudmip"))) {
             calculateursLoadBalancing = new ArrayList<>();
+            mode = args[1];
             // Le Repartiteur ne doit pas être intelligent : c'est le VMManager qui va gérer cet attribut
 
             WebServer webServer = new WebServer(Integer.parseInt(args[0]));
@@ -55,6 +56,8 @@ public class Repartiteur {
             while (true) {
                 int i = 1;
             }
+        } else {
+            System.out.println("Erreu : usage -> ./Repartiteur <port> <mode:local/cloudmip");
         }
     }
 
@@ -99,29 +102,23 @@ public class Repartiteur {
 
 
     //	public int add(int i1, int i2) throws CalculatorsManagementException {
-    public String add(int i1, int i2) throws CalculatorsManagementException, MissingImageException,
+    public String requete(int id, int i1) throws CalculatorsManagementException, MissingImageException,
             NotEnoughtResourceException {
-        LOGGER.severe("!!!!!!!!!!!!!!!!!!!!!" + i1 + " " + i2);
+        LOGGER.info("*--**--**--**--* REQUETE __" + id + "__ RECUE");
         int res = 0;
         try {
-            res = transmettreLaRequete(i1);
+            res = transmettreLaRequete(id, i1);
         } catch (XmlRpcException e) {
             e.printStackTrace();
         } catch (CalculatorsManagementException e) {
             e.printStackTrace();
         }
-//		return res;
-        LOGGER.info("/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1 == i2) + "Calc courant : " +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getPort() + ". Sa charge : " +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_courante() + "/" +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_max() + " RES : " + res);
-        return "/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\" + (i1 == i2) + "Calc courant : " +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getPort() + ". Sa charge : " +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_courante() + "/" +
-                calculateursLoadBalancing.get(calcIndexLoadBalance).getCharge_max() + " RES : " + res;
+
+        return "/\\/\\/\\/\\/\\/\\/     ID     \\/\\/\\/\\/\\/\\" + i1 + "Calc courant : " +
+                calculateursLoadBalancing.get(calcIndexLoadBalance).toString() + " RES : " + res;
     }
 
-    public synchronized int transmettreLaRequete(int i) throws XmlRpcException, CalculatorsManagementException,
+    public synchronized int transmettreLaRequete(int id, int i) throws XmlRpcException, CalculatorsManagementException,
             MissingImageException, NotEnoughtResourceException {
         LOGGER.info("Transmission de requ�te.");
         // TODO : PLUS BESOIN
@@ -130,10 +127,13 @@ public class Repartiteur {
         // Choisir le calculateur
         Integer result = null;
         if (calcIndexLoadBalance <= calculateursLoadBalancing.size()) {
+            LOGGER.info("                                           Selection du calculateur");
             InfoCalculateur calculateur = choisirCalculateur();
 
-            calculateur.setCharge_courante(calculateur.getCharge_courante() + 1.);
-            Object[] params = new Object[]{new Integer(i), new Integer(3)};
+            if (this.mode.equals("local")) {
+                calculateur.setCharge_courante(calculateur.getCharge_courante() + 1.);
+            }
+            Object[] params = new Object[]{new Integer(id), new Integer(i)};
 //			Integer result = (Integer) calculateurCourant.getClient().execute("Calculateur.add", params);
 
 
@@ -142,13 +142,15 @@ public class Repartiteur {
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
             writer.println
                     ("------------------------------------------------------------------------------------------------------------------------------------------------- Transmission au calculateur " + calculateur.getAdresse() + ":" + calculateur.getPort() + " de charge " + calculateur.getCharge_courante());
-            result = (Integer) calculateur.getClient().execute("Calculateur.add", params);
+            result = (Integer) calculateur.getClient().execute("Calculateur.requette", params);
 
             calcIndexLoadBalance = (calcIndexLoadBalance + 1) % calculateursLoadBalancing.size();
 
             LOGGER.info("RESULTAT : " + result);
             if (calculateur.getCharge_courante() >= 0) {
-                calculateur.setCharge_courante(calculateur.getCharge_courante() - 1.);
+                if (this.mode.equals("local")) {
+                    calculateur.setCharge_courante(calculateur.getCharge_courante() - 1.);
+                }
             }
         }
         if (result == null) {
@@ -215,7 +217,6 @@ public class Repartiteur {
 
         System.out.print("Mise � jour ? > ");
         // update_repartiteur pascompris pascompris add 127.0.0.1 2012
-        toto = Integer.parseInt(portCalc);
         List<String> adresses = getUsedAddresses();
         if (requete.equals("add")) {
             if (adresses.contains(Integer.parseInt(portCalc))) {
@@ -263,7 +264,7 @@ public class Repartiteur {
     public boolean setCharge(String adresse, int port, double charge) {
         for (InfoCalculateur calcInfo :
                 this.calculateursLoadBalancing) {
-            if(calcInfo.getAdresse().equals(adresse) && calcInfo.getPort() == port) {
+            if (calcInfo.getAdresse().equals(adresse) && calcInfo.getPort() == port) {
                 calcInfo.setCharge_courante(charge);
                 return true;
             }

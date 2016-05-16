@@ -28,6 +28,7 @@ public class Client {
     private static Boolean argOK = false;
     private static PrintWriter writer;
     private static CustomXmlRpcClient client;
+    private static int idRequete = 0;
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
@@ -68,8 +69,9 @@ public class Client {
                             public void run() {
                                 String result2 = "";
                                 try {
-                                    Object[] params = new Object[]{new Integer(10000), new Integer(3)};
-                                    client.executeAsync("Calculateur.add", params, new AsyncCallback() {
+                                    Object[] params = new Object[]{new Integer(idRequete), new Integer(10000)};
+                                    idRequete ++;
+                                    client.executeAsync("Calculateur.requete", params, new AsyncCallback() {
 
                                         public void handleResult(XmlRpcRequest arg0, Object arg1) {
                                             System.out.println("File is created!");
