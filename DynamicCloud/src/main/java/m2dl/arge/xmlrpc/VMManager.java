@@ -86,7 +86,7 @@ public class VMManager {
                     * selon leur propre VM*/
 
                 /********************** AJOUT DE VM **********************/
-            LOGGER.info("/************************* VEILLE DU VMMANAGER *************************/");
+            LOGGER.info("\n\n/************************* VEILLE DU VMMANAGER *************************/");
                 double cpuForAllVM = 0.;
                 for (InfoCalculateur calc :
                         calculateurs) {
