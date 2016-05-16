@@ -102,8 +102,7 @@ public class Repartiteur {
 
 
     //	public int add(int i1, int i2) throws CalculatorsManagementException {
-    public String add(int id, int i1) throws CalculatorsManagementException, MissingImageException,
-            NotEnoughtResourceException {
+    public String add(int id, int i1) throws XmlRpcException, CalculatorsManagementException, MissingImageException, NotEnoughtResourceException {
         LOGGER.info("                                                       \u001B[33m" + "*--**--**--**--* REQUETE " +
                 "__" + id + "__ RECUE" +
                 "\u001B[0m");
@@ -115,11 +114,25 @@ public class Repartiteur {
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
+            throw e;
         } catch (CalculatorsManagementException e) {
             LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
                     .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
                     "\u001B[0m \n");
             e.printStackTrace();
+            throw e;
+        } catch (MissingImageException e) {
+            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                    .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
+                    "\u001B[0m \n");
+            e.printStackTrace();
+            throw e;
+        } catch (NotEnoughtResourceException e) {
+            LOGGER.info("                                                       \u001B[32m" + "ERREUR : " + e
+                    .getMessage() + " \n" + e.getCause() + " \n" + e.getStackTrace() +
+                    "\u001B[0m \n");
+            e.printStackTrace();
+            throw e;
         }
         LOGGER.info("                                                       \u001B[32m" + "resultat : " + res +
                 "\u001B[0m");
