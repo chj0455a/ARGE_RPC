@@ -1,4 +1,4 @@
-package m2dl.arge.xmlrpc;
+package m2dl.arge.xmlrpc.exception;
 
 import java.io.Serializable;
 

@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import m2dl.arge.xmlrpc.exception.CalculatorsManagementException;
+import m2dl.arge.xmlrpc.exception.MissingImageException;
+import m2dl.arge.xmlrpc.exception.NotEnoughtResourceException;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.xmlrpc.XmlRpcException;
 //  import org.apache.xmlrpc.demo.webserver.proxy.impls.AdderImpl;
-import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;

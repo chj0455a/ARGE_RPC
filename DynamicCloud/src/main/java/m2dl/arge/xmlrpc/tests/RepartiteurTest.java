@@ -1,5 +1,9 @@
-package m2dl.arge.xmlrpc;
+package m2dl.arge.xmlrpc.tests;
 
+import m2dl.arge.xmlrpc.CalcState;
+import m2dl.arge.xmlrpc.InfoCalculateur;
+import m2dl.arge.xmlrpc.Repartiteur;
+import m2dl.arge.xmlrpc.exception.NotEnoughtResourceException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

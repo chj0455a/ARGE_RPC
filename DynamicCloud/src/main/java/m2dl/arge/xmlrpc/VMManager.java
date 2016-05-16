@@ -1,6 +1,7 @@
 package m2dl.arge.xmlrpc;
 
 
+import m2dl.arge.xmlrpc.exception.MissingImageException;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
