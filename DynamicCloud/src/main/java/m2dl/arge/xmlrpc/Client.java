@@ -69,7 +69,7 @@ public class Client {
                             public void run() {
                                 String result2 = "";
                                 try {
-                                    Object[] params = new Object[]{new Integer(idRequete), new Integer(10000)};
+                                    Object[] params = new Object[]{new Integer(idRequete), new Integer(idRequete)};
                                     idRequete ++;
                                     client.executeAsync("Calculateur.add", params, new AsyncCallback() {
 
