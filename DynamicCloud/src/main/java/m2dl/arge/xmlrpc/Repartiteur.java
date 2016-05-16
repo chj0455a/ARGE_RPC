@@ -21,7 +21,7 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 public class Repartiteur {
-    private static final double LIMIT = 400.00;
+    private static final double LIMIT = 80.00;
     private static Logger LOGGER = Logger.getLogger("Repartiteur");
     private static final int port = 8080;
 
@@ -157,12 +157,6 @@ public class Repartiteur {
         return result;
     }
 
-    /**
-     * Le Répartiteur a un brin d'intelligence : il est censé redistribué la charge aux calculateurs moins encombrés
-     * si certain sont trop chargés au lieu de faire du roundrobin pur et dur
-     * @return InfoCalculateur
-     * @throws NotEnoughtResourceException
-     */
     public InfoCalculateur choisirCalculateur() throws NotEnoughtResourceException {
         LOGGER.info("CHOISIR le calculateur");
         InfoCalculateur choosenCalc = null;
@@ -264,5 +258,16 @@ public class Repartiteur {
 
     public boolean removeCalculateur(InfoCalculateur infoCalculateur) {
         return this.calculateursLoadBalancing.remove(infoCalculateur);
+    }
+
+    public boolean setCharge(String adresse, int port, double charge) {
+        for (InfoCalculateur calcInfo :
+                this.calculateursLoadBalancing) {
+            if(calcInfo.getAdresse().equals(adresse) && calcInfo.getPort() == port) {
+                calcInfo.setCharge_courante(charge);
+                return true;
+            }
+        }
+        return false;
     }
 }

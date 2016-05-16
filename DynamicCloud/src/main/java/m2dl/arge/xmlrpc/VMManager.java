@@ -91,9 +91,18 @@ public class VMManager {
                 for (InfoCalculateur calc :
                         calculateurs) {
                 LOGGER.info("/** Calculateur examiné : " + calc.toString() + " **/");
-                    double cpu = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
-                    LOGGER.info("-----------------------------Sa CPU : " + cpu + "-----------------------------");
-                    cpuForAllVM += cpu;
+                    double cpu1 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    double cpu2 = (double) calc.getClient().execute("Calculateur.getCPUCharge", new Object[]{});
+                    double cpuMoy = (cpu1 + cpu2) / 2.;
+                    LOGGER.info("-----------------------------Sa CPU : " + cpuMoy + "-----------------------------");
+                    cpuForAllVM += cpuMoy;
+                    Object[] params2 = {new String(calc.getAdresse()), new Integer(calc.getPort()), new Double(cpuMoy)};
+                    calc.getClient().executeAsync("Repartiteur.setCharge", params, null);
                 }
                 LOGGER.info("-----------------------------CPU TOTALE----------------------------- " + cpuForAllVM + "" +
                         " -> " +  (cpuForAllVM / calculateurs.size() > 80. && calculateurs.size() < 5) + " car nb " +
