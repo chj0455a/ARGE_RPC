@@ -221,7 +221,7 @@ public class VMManager {
 
         LOGGER.info("Transmission du calculateur au Repartiteur");
         try {
-            client.execute("Repartiteur.addCalculateur", params);
+            boolean result = (boolean) client.execute("Repartiteur.addCalculateur", params);
         } catch (XmlRpcException e) {
             LOGGER.info("ECHEC :" + e.getMessage());
             e.printStackTrace();
